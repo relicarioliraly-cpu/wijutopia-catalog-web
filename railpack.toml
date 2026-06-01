@@ -1,0 +1,9 @@
+# Railway/Railpack fallback when the service root is the repository root.
+# The real web application lives in frontend/, while the root package.json only
+# orchestrates local development. These commands force the frontend build/start
+# so deployments do not fail with "no start command detected".
+[build]
+cmd = "npm --prefix frontend install && npm --prefix frontend run build"
+
+[start]
+cmd = "npm --prefix frontend start"
