@@ -1,18 +1,20 @@
 import SegmentedCatalog from '@/components/SegmentedCatalog';
-import { findMarketplace, marketplaceCatalog } from '@/lib/catalogTaxonomy';
+import { findGame, gameCatalog } from '@/lib/catalogTaxonomy';
 
 export function generateStaticParams() {
-  return marketplaceCatalog.map((marketplace) => ({ slug: marketplace.slug }));
+  return gameCatalog.map((game) => ({ slug: game.slug }));
 }
 
 export default function MarketplacePage({ params }: { params: { slug: string } }) {
-  const marketplace = findMarketplace(params.slug) || marketplaceCatalog[0];
+  const game = findGame(params.slug) || gameCatalog[0];
+  const matchTerms = [game.name, game.marker, game.slug, ...game.name.split(' ')];
   return (
     <SegmentedCatalog
-      title={`Referencia ${marketplace.label}`}
-      subtitle={marketplace.description}
-      marker={marketplace.label}
-      heroGradient="from-slate-900 to-wiju-signMagenta"
+      title={game.name}
+      subtitle={`${game.description} Ramas: ${game.branches.join(' · ')}.`}
+      marker={game.marker}
+      categoryMatch={matchTerms}
+      heroGradient={game.color}
     />
   );
 }
