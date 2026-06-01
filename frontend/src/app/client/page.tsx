@@ -297,45 +297,72 @@ export default function ClientPage() {
         </aside>
       </section>
 
-      <section className="grid gap-8 lg:grid-cols-2">
+      <section className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr]">
         <form onSubmit={handleLaunchRequest} className="rounded-3xl border border-wiju-borderLight bg-wiju-cardLight p-6 shadow-card dark:border-wiju-borderDark dark:bg-wiju-cardDark">
-          <p className="text-sm font-black uppercase tracking-[0.25em] text-wiju-crimson dark:text-wiju-gold">Lanzamientos</p>
+          <p className="text-sm font-black uppercase tracking-[0.25em] text-wiju-signMagenta dark:text-wiju-moonGold">Lanzamientos</p>
           <h2 className="mt-2 text-2xl font-black">Pedir próximo lanzamiento</h2>
+          <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">Solicita productos que todavía no aparecen en catálogo para que el panel administrativo los evalúe por temporada.</p>
           <div className="mt-5 grid gap-3">
             <input name="productName" placeholder="Nombre del producto esperado" className="rounded-xl border p-3 text-black" required />
             <input name="franchise" placeholder="Franquicia: Pokémon, One Piece, Digimon..." className="rounded-xl border p-3 text-black" required />
             <input name="customerEmail" type="email" placeholder="Correo opcional" className="rounded-xl border p-3 text-black" />
             <input name="requestedQuantity" type="number" min="1" defaultValue="1" className="rounded-xl border p-3 text-black" />
             <textarea name="notes" placeholder="Notas: idioma, rareza, fecha de salida, presupuesto..." className="rounded-xl border p-3 text-black" />
-            <button type="submit" className="rounded-2xl bg-wiju-crimson px-4 py-3 font-black text-white dark:bg-wiju-gold dark:text-black">Enviar pedido</button>
+            <button type="submit" className="rounded-2xl bg-wiju-signMagenta px-4 py-3 font-black text-white shadow-neon dark:bg-wiju-moonGold dark:text-wiju-ink">Enviar pedido</button>
           </div>
         </form>
 
-        <form onSubmit={handleResearchSubmit} className="rounded-3xl border border-wiju-borderLight bg-wiju-cardLight p-6 shadow-card dark:border-wiju-borderDark dark:bg-wiju-cardDark">
-          <p className="text-sm font-black uppercase tracking-[0.25em] text-wiju-crimson dark:text-wiju-gold">Conducta del cliente</p>
-          <h2 className="mt-2 text-2xl font-black">Encuesta, trivia y satisfacción</h2>
-          <div className="mt-5 grid gap-3">
-            <input name="customerEmail" type="email" placeholder="Correo opcional" className="rounded-xl border p-3 text-black" />
-            <input name="favoriteFranchise" placeholder="Franquicia favorita" className="rounded-xl border p-3 text-black" required />
-            <select name="satisfactionScore" className="rounded-xl border p-3 text-black" required>
-              <option value="5">5 - Muy satisfecho</option>
-              <option value="4">4 - Satisfecho</option>
-              <option value="3">3 - Neutral</option>
-              <option value="2">2 - Insatisfecho</option>
-              <option value="1">1 - Muy insatisfecho</option>
-            </select>
-            <input name="preferredBudget" type="number" min="0" step="0.01" placeholder="Presupuesto mensual aproximado" className="rounded-xl border p-3 text-black" />
-            <select name="playStyle" className="rounded-xl border p-3 text-black">
-              <option value="competitivo">Competitivo</option>
-              <option value="coleccionista">Coleccionista</option>
-              <option value="casual">Casual</option>
-              <option value="inversion">Inversión/rareza</option>
-            </select>
-            <input name="triviaAnswer" placeholder="Trivia: ¿qué formato/evento te interesa más?" className="rounded-xl border p-3 text-black" />
-            <textarea name="comments" placeholder="¿Qué productos debería traer la tienda demo para ti?" className="rounded-xl border p-3 text-black" />
-            <button type="submit" className="rounded-2xl bg-wiju-gold px-4 py-3 font-black text-black">Guardar investigación</button>
-          </div>
-        </form>
+        <section className="rounded-3xl border border-wiju-moonGold/50 bg-white p-6 shadow-neon dark:bg-wiju-doorPurple/60">
+          <p className="text-sm font-black uppercase tracking-[0.25em] text-wiju-signMagenta dark:text-wiju-moonGold">Tu opinión</p>
+          <h2 className="mt-2 text-2xl font-black">Ayúdanos a entender tu conducta como cliente</h2>
+          <p className="mt-2 text-sm text-slate-600 dark:text-slate-200">Separé esta zona en encuesta, trivia y satisfacción para que cada respuesta tenga un propósito claro dentro del informe administrativo.</p>
+
+          <form onSubmit={handleResearchSubmit} className="mt-6 space-y-5">
+            <div className="grid gap-5 xl:grid-cols-3">
+              <fieldset className="rounded-3xl border border-wiju-logoWine/20 bg-wiju-logoWine/5 p-5 dark:border-white/15 dark:bg-black/20">
+                <legend className="rounded-full bg-wiju-logoWine px-3 py-1 text-sm font-black text-white">1. Encuesta</legend>
+                <p className="mt-4 text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Preferencias de compra</p>
+                <div className="mt-3 grid gap-3">
+                  <input name="customerEmail" type="email" placeholder="Correo opcional" className="rounded-xl border p-3 text-black" />
+                  <input name="favoriteFranchise" placeholder="Franquicia favorita" className="rounded-xl border p-3 text-black" required />
+                  <input name="preferredBudget" type="number" min="0" step="0.01" placeholder="Presupuesto mensual aproximado" className="rounded-xl border p-3 text-black" />
+                  <select name="playStyle" className="rounded-xl border p-3 text-black">
+                    <option value="competitivo">Competitivo</option>
+                    <option value="coleccionista">Coleccionista</option>
+                    <option value="casual">Casual</option>
+                    <option value="inversion">Inversión/rareza</option>
+                  </select>
+                </div>
+              </fieldset>
+
+              <fieldset className="rounded-3xl border border-wiju-logoWine/20 bg-wiju-logoWine/5 p-5 dark:border-white/15 dark:bg-black/20">
+                <legend className="rounded-full bg-wiju-moonGold px-3 py-1 text-sm font-black text-wiju-ink">2. Trivia</legend>
+                <p className="mt-4 text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Eventos y comunidad</p>
+                <div className="mt-3 grid gap-3">
+                  <input name="triviaAnswer" placeholder="¿Qué formato/evento te interesa más?" className="rounded-xl border p-3 text-black" />
+                  <textarea name="comments" placeholder="¿Qué productos debería traer la tienda demo para ti?" className="min-h-32 rounded-xl border p-3 text-black" />
+                </div>
+              </fieldset>
+
+              <fieldset className="rounded-3xl border border-wiju-logoWine/20 bg-wiju-logoWine/5 p-5 dark:border-white/15 dark:bg-black/20">
+                <legend className="rounded-full bg-wiju-logoWine px-3 py-1 text-sm font-black text-white">3. Satisfacción</legend>
+                <p className="mt-4 text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Experiencia del catálogo</p>
+                <div className="mt-3 grid gap-3">
+                  <select name="satisfactionScore" className="rounded-xl border p-3 text-black" required>
+                    <option value="5">5 - Muy satisfecho</option>
+                    <option value="4">4 - Satisfecho</option>
+                    <option value="3">3 - Neutral</option>
+                    <option value="2">2 - Insatisfecho</option>
+                    <option value="1">1 - Muy insatisfecho</option>
+                  </select>
+                  <p className="rounded-2xl bg-wiju-moonGold/15 p-3 text-xs font-semibold text-slate-700 dark:text-slate-100">Tu respuesta se guarda como investigación de cliente para decidir productos, restock y eventos futuros del prototipo.</p>
+                </div>
+              </fieldset>
+            </div>
+
+            <button type="submit" className="w-full rounded-2xl bg-wiju-moonGold px-4 py-3 font-black text-wiju-ink shadow-neon">Guardar mi opinión</button>
+          </form>
+        </section>
       </section>
     </main>
   );
