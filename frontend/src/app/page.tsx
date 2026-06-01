@@ -1,4 +1,4 @@
-import { CardsIcon, CartIcon, ChartIcon, SparkIcon, StoreIcon, TagIcon } from '@/components/Icons';
+import { CardsIcon, CartIcon, ChartIcon, SparkIcon, TagIcon } from '@/components/Icons';
 
 const quickCards = [
   { href: '/games', label: 'Juegos ramificados', description: 'Pokémon, Yu-Gi-Oh!, One Piece, Digimon y más.', icon: CardsIcon },
@@ -12,7 +12,10 @@ export default function HomePage() {
       <section className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
         <div className="space-y-7">
           <p className="inline-flex items-center gap-2 rounded-full border border-wiju-moonGold/50 px-4 py-2 text-sm font-bold text-wiju-signMagenta dark:text-wiju-moonGold"><SparkIcon className="h-4 w-4" /> Next.js + Express.js + MySQL</p>
-          <h1 className="text-5xl font-black leading-tight md:text-7xl">Wiju&apos;s TCG Store visual, claro y conectado.</h1>
+          <div className="flex items-center gap-4">
+            <img src="/wijutopia-logo.svg" alt="Logo Wijutopia Card Game Store" className="h-24 w-24 rounded-full bg-white p-1 shadow-neon" />
+            <h1 className="text-4xl font-black leading-tight md:text-7xl">Wijutopia TCG visual, claro y conectado.</h1>
+          </div>
           <p className="max-w-3xl text-lg text-slate-600 dark:text-slate-300">
             Prototipo académico con catálogo TCG, carrito, restock por señales, panel administrativo y una vista más limpia inspirada en la fachada morada de Wiju&apos;s.
           </p>
@@ -27,13 +30,13 @@ export default function HomePage() {
           <div className="relative space-y-5">
             <div className="wiju-store-card animate-float rounded-[2rem] border-4 border-wiju-ink p-5 shadow-2xl">
               <div className="mb-5 flex items-center justify-between">
-                <div className="rounded-xl border-4 border-wiju-ink bg-wiju-signMagenta px-6 py-3 text-4xl font-black tracking-wide shadow-xl">WIJU&apos;S</div>
-                <div className="grid h-16 w-16 place-items-center rounded-full border-4 border-white bg-wiju-signMagenta"><StoreIcon className="h-9 w-9" /></div>
+                <div className="rounded-xl border-4 border-wiju-ink bg-wiju-logoWine px-6 py-3 text-4xl font-black tracking-wide shadow-xl">WIJUTOPIA</div>
+                <img src="/wijutopia-logo.svg" alt="Logo Wijutopia" className="h-16 w-16 rounded-full border-4 border-white bg-white" />
               </div>
               <div className="grid gap-4 md:grid-cols-[1fr_0.55fr_1fr]">
-                <div className="grid min-h-28 place-items-center rounded-2xl border-4 border-wiju-ink bg-wiju-signMagenta"><span className="text-5xl font-black">W</span></div>
+                <div className="grid min-h-28 place-items-center rounded-2xl border-4 border-wiju-ink bg-wiju-logoWine"><img src="/wijutopia-logo.svg" alt="Logo de vitrina Wijutopia" className="h-24 w-24 rounded-full bg-white" /></div>
                 <div className="rounded-2xl border-4 border-wiju-ink bg-wiju-doorPurple p-4"><div className="mx-auto mt-6 h-10 w-10 rounded-full bg-wiju-moonGold" /></div>
-                <div className="grid min-h-28 place-items-center rounded-2xl border-4 border-wiju-ink bg-wiju-signMagenta"><CartIcon className="h-16 w-16" /></div>
+                <div className="grid min-h-28 place-items-center rounded-2xl border-4 border-wiju-ink bg-wiju-logoWine"><CartIcon className="h-16 w-16" /></div>
               </div>
             </div>
             <div className="grid gap-3 sm:grid-cols-3">
