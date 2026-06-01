@@ -130,21 +130,21 @@ curl -X POST http://localhost:5000/api/metrics/track \
 
 
 
-## 🗂️ Estructura web ramificada tipo marketplace
+## 🗂️ Estructura web ramificada tipo catálogo TCG
 
-El frontend ahora separa el sitio en páginas jerárquicas para simular una navegación similar a referencias como TCGPlayer/Cardmarket:
+El frontend ahora separa el sitio en páginas jerárquicas de catálogo TCG, usando etiquetas internas de la tienda en lugar de plataformas externas:
 
 - `/games`: índice de juegos con marcadores por franquicia.
 - `/games/pokemon`, `/games/yugioh`, `/games/one-piece`, `/games/digimon`, `/games/dragon-ball`, `/games/magic`: páginas dedicadas por juego.
 - `/singles`, `/sealed`, `/accessories`, `/releases`, `/restock`: ramas transversales del catálogo.
-- `/marketplaces/tcgplayer`, `/marketplaces/cardmarket`, `/marketplaces/tradingcardmint`, `/marketplaces/local-wijutopia`: páginas por etiqueta comparativa.
+- `/store-tags/en-vitrina`, `/store-tags/pedido-por-encargo`, `/store-tags/restock-prioritario`, `/store-tags/preventa-wijutopia`, `/store-tags/torneo-liga`, `/store-tags/accesorio-tcg`: páginas por etiqueta operativa de tienda.
 
 Cada página mantiene la jerarquía `Juego → Rama de catálogo → disponibilidad/señales`, y registra interés de productos para alimentar el análisis de restock.
 
 ## 🧪 Nuevas funciones de investigación comercial
 
 - El aviso legal inicial se muestra como modal para dejar claro que el sitio es un prototipo académico/no oficial antes de navegar.
-- Las tarjetas muestran etiquetas comparativas o demostrativas como `TCGPlayer`, `Cardmarket`, `TradingCardMint` o `Local Wijutopia`.
+- Las tarjetas muestran etiquetas operativas de tienda como `En vitrina`, `Pedido por encargo`, `Restock prioritario`, `Preventa Wijutopia`, `Torneo/Liga` o `Accesorio TCG`.
 - Cada producto muestra estado `Disponible` o `Agotado`; si está agotado, el cliente puede pedir stock/restock.
 - La lógica de stock/restock no se aprueba inmediatamente: queda en espera hasta que el producto alcance un umbral de señales por temporada.
 - Las señales combinan vistas del producto, clics dentro de la página y mensajes del WhatsApp oficial de la tienda preguntando por stock/restock o lanzamientos.

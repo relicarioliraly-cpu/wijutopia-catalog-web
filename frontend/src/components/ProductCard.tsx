@@ -65,7 +65,7 @@ export default function ProductCard({
       </button>
       <div className="space-y-4 p-5">
         <div className="flex flex-wrap gap-2">
-          <span className="rounded-full border border-wiju-borderLight px-3 py-1 text-xs font-bold dark:border-wiju-borderDark">{product.marketplace_tag || 'Local Wijutopia'}</span>
+          <span className="rounded-full border border-wiju-borderLight px-3 py-1 text-xs font-bold dark:border-wiju-borderDark">{product.product_tag || 'En vitrina'}</span>
           <span className="rounded-full border border-wiju-borderLight px-3 py-1 text-xs font-bold dark:border-wiju-borderDark">{product.category || 'TCG'}</span>
         </div>
         <div>

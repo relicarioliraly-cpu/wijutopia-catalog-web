@@ -1,5 +1,5 @@
 import ThemeToggle from '@/components/ThemeToggle';
-import { gameCatalog, marketplaceCatalog, productBranches } from '@/lib/catalogTaxonomy';
+import { gameCatalog, productBranches, storeTagCatalog } from '@/lib/catalogTaxonomy';
 
 export default function SiteNav() {
   return (
@@ -32,9 +32,9 @@ export default function SiteNav() {
             </div>
           </section>
           <section>
-            <p className="mb-2 font-black uppercase tracking-[0.2em] text-wiju-crimson dark:text-wiju-gold">Referencias</p>
+            <p className="mb-2 font-black uppercase tracking-[0.2em] text-wiju-crimson dark:text-wiju-gold">Etiquetas de tienda</p>
             <div className="flex flex-wrap gap-2">
-              {marketplaceCatalog.map((marketplace) => <a key={marketplace.slug} href={`/marketplaces/${marketplace.slug}`} className="rounded-full border border-wiju-borderLight px-3 py-1 dark:border-wiju-borderDark">{marketplace.label}</a>)}
+              {storeTagCatalog.map((tag) => <a key={tag.slug} href={`/store-tags/${tag.slug}`} className="rounded-full border border-wiju-borderLight px-3 py-1 dark:border-wiju-borderDark">{tag.label}</a>)}
             </div>
           </section>
         </div>

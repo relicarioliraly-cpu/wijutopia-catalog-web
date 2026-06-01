@@ -8,7 +8,7 @@ export type Product = {
   stock: number;
   image_url?: string | null;
   category?: string | null;
-  marketplace_tag?: 'TCGPlayer' | 'Cardmarket' | 'TradingCardMint' | 'Local Wijutopia';
+  product_tag?: 'En vitrina' | 'Pedido por encargo' | 'Restock prioritario' | 'Preventa Wijutopia' | 'Torneo/Liga' | 'Accesorio TCG';
   release_status?: 'catalogo' | 'lanzamiento';
   preorder_available?: boolean;
   created_at?: string;

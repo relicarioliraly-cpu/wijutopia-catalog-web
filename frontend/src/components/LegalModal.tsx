@@ -27,7 +27,7 @@ export default function LegalModal() {
         <p className="text-sm font-black uppercase tracking-[0.25em] text-wiju-crimson dark:text-wiju-gold">Aviso académico obligatorio</p>
         <h2 id="legal-modal-title" className="mt-3 text-3xl font-black">Esta no es una página oficial</h2>
         <div className="mt-4 space-y-3 text-sm leading-6 text-slate-700 dark:text-slate-200">
-          <p>Este sitio es únicamente un prototipo para un examen de prueba. No representa legal, comercial ni oficialmente a Wijutopia, Wiju World, Pokémon, Yu-Gi-Oh!, Bandai, Digimon, One Piece, TCGPlayer, Cardmarket ni TradingCardMint.</p>
+          <p>Este sitio es únicamente un prototipo para un examen de prueba. No representa legal, comercial ni oficialmente a Wijutopia, Wiju World, Pokémon, Yu-Gi-Oh!, Bandai, Digimon, One Piece, plataformas comerciales externas ni marcas no autorizadas.</p>
           <p>No procesa pagos reales, no confirma inventario oficial y no debe usarse para compras reales. Su propósito es demostrar arquitectura full-stack, catálogo, métricas, encuestas, pedidos de lanzamiento y reportes administrativos.</p>
         </div>
         <button type="button" onClick={closeModal} className="mt-6 w-full rounded-2xl bg-wiju-crimson px-5 py-3 font-black text-white dark:bg-wiju-gold dark:text-black">

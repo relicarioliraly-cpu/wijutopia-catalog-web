@@ -14,7 +14,7 @@ export default function HomePage() {
       </section>
       <section className="grid gap-4 sm:grid-cols-2">
         <a href="/games" className="rounded-3xl border border-wiju-borderLight bg-wiju-cardLight p-6 font-black shadow-card dark:border-wiju-borderDark dark:bg-wiju-cardDark">Explorar juegos ramificados →</a>
-        <a href="/marketplaces/tcgplayer" className="rounded-3xl border border-wiju-borderLight bg-wiju-cardLight p-6 font-black shadow-card dark:border-wiju-borderDark dark:bg-wiju-cardDark">Vista referencia TCGPlayer/Cardmarket →</a>
+        <a href="/store-tags/en-vitrina" className="rounded-3xl border border-wiju-borderLight bg-wiju-cardLight p-6 font-black shadow-card dark:border-wiju-borderDark dark:bg-wiju-cardDark">Vista por etiquetas internas de tienda →</a>
       </section>
       <section className="rounded-[2rem] border border-wiju-borderLight bg-wiju-cardLight p-8 shadow-card dark:border-wiju-borderDark dark:bg-wiju-cardDark">
         <h2 className="text-2xl font-black">Alcance del examen</h2>

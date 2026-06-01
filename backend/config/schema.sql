@@ -19,7 +19,9 @@ CREATE TABLE IF NOT EXISTS products (
     stock INT NOT NULL DEFAULT 0,
     image_url VARCHAR(500) NULL,
     category VARCHAR(120) DEFAULT 'TCG',
-    marketplace_tag ENUM('TCGPlayer', 'Cardmarket', 'TradingCardMint', 'Local Wijutopia') DEFAULT 'Local Wijutopia',
+    -- Etiqueta operativa propia de la tienda: evita depender de plataformas externas
+    -- y permite clasificar el producto según el flujo comercial real de Wijutopia.
+    product_tag ENUM('En vitrina', 'Pedido por encargo', 'Restock prioritario', 'Preventa Wijutopia', 'Torneo/Liga', 'Accesorio TCG') DEFAULT 'En vitrina',
     release_status ENUM('catalogo', 'lanzamiento') DEFAULT 'catalogo',
     preorder_available BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

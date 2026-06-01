@@ -227,7 +227,7 @@ export default function ClientPage() {
         </article>
         <article className="rounded-3xl border border-wiju-borderLight bg-wiju-cardLight p-6 dark:border-wiju-borderDark dark:bg-wiju-cardDark">
           <h2 className="text-xl font-black">Etiquetas de referencia</h2>
-          <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">Los productos pueden mostrar TCGPlayer, Cardmarket, TradingCardMint o Local Wijutopia como etiquetas comparativas/demostrativas.</p>
+          <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">Los productos pueden mostrar En vitrina, Pedido por encargo, Restock prioritario, Preventa Wijutopia, Torneo/Liga o Accesorio TCG como etiquetas comparativas/demostrativas.</p>
         </article>
         <article className="rounded-3xl border border-wiju-borderLight bg-wiju-cardLight p-6 dark:border-wiju-borderDark dark:bg-wiju-cardDark">
           <h2 className="text-xl font-black">Disponibilidad</h2>

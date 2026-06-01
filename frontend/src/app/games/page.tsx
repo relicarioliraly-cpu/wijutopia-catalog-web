@@ -6,7 +6,7 @@ export default function GamesIndexPage() {
       <section className="rounded-[2rem] bg-gradient-to-br from-wiju-crimson to-black p-8 text-white shadow-card">
         <p className="text-sm font-black uppercase tracking-[0.3em] text-wiju-gold">Mapa jerárquico</p>
         <h1 className="mt-3 text-5xl font-black">Juegos TCG separados por páginas</h1>
-        <p className="mt-4 max-w-4xl text-white/80">Estructura tipo marketplace: cada juego tiene su marcador, ramas internas y seguimiento de catálogo para vistas, clics, WhatsApp, restock y lanzamientos.</p>
+        <p className="mt-4 max-w-4xl text-white/80">Estructura tipo catálogo profesional: cada juego tiene su marcador, ramas internas y seguimiento de catálogo para vistas, clics, WhatsApp, restock y lanzamientos.</p>
       </section>
       <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
         {gameCatalog.map((game) => (

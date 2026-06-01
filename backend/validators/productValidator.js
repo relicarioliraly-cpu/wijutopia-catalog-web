@@ -16,7 +16,7 @@ const productSchema = Joi.object({
     }),
     image_url: Joi.string().uri().allow('', null),
     category: Joi.string().max(120).allow('', null),
-    marketplace_tag: Joi.string().valid('TCGPlayer', 'Cardmarket', 'TradingCardMint', 'Local Wijutopia').default('Local Wijutopia'),
+    product_tag: Joi.string().valid('En vitrina', 'Pedido por encargo', 'Restock prioritario', 'Preventa Wijutopia', 'Torneo/Liga', 'Accesorio TCG').default('En vitrina'),
     release_status: Joi.string().valid('catalogo', 'lanzamiento').default('catalogo'),
     preorder_available: Joi.boolean().default(false)
 });

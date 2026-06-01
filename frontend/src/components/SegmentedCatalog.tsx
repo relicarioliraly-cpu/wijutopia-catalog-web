@@ -10,7 +10,7 @@ type SegmentedCatalogProps = {
   marker?: string;
   gameSlug?: string;
   categoryMatch?: string[];
-  marketplaceLabel?: string;
+  storeTagLabel?: string;
   branchLabel?: string;
   heroGradient?: string;
 };
@@ -22,7 +22,7 @@ export default function SegmentedCatalog({
   subtitle,
   marker,
   categoryMatch = [],
-  marketplaceLabel,
+  storeTagLabel,
   branchLabel,
   heroGradient = 'from-wiju-crimson to-black'
 }: SegmentedCatalogProps) {
@@ -36,20 +36,23 @@ export default function SegmentedCatalog({
       .catch((error) => setMessage(error.message));
   }, []);
 
+  // Filtrado local para que una misma pantalla pueda funcionar como página de juego,
+  // página de etiqueta de tienda o rama transversal sin duplicar componentes.
   const filteredProducts = useMemo(() => {
     const terms = categoryMatch.map((item) => item.toLowerCase());
     const q = query.toLowerCase();
     return products.filter((product) => {
       const availability = product.stock > 0 ? 'disponible' : 'agotado restock';
-      const haystack = `${product.name} ${product.description || ''} ${product.category || ''} ${product.marketplace_tag || ''} ${product.release_status || ''} ${availability}`.toLowerCase();
+      const haystack = `${product.name} ${product.description || ''} ${product.category || ''} ${product.product_tag || ''} ${product.release_status || ''} ${availability}`.toLowerCase();
       const matchesGame = terms.length === 0 || terms.some((term) => haystack.includes(term));
-      const matchesMarketplace = !marketplaceLabel || product.marketplace_tag === marketplaceLabel;
+      const matchesStoreTag = !storeTagLabel || product.product_tag === storeTagLabel;
       const matchesBranch = !branchLabel || haystack.includes(branchLabel.toLowerCase()) || branchLabel === 'Todos';
       const matchesQuery = !q || haystack.includes(q);
-      return matchesGame && matchesMarketplace && matchesBranch && matchesQuery;
+      return matchesGame && matchesStoreTag && matchesBranch && matchesQuery;
     });
-  }, [branchLabel, categoryMatch, marketplaceLabel, products, query]);
+  }, [branchLabel, categoryMatch, storeTagLabel, products, query]);
 
+  // El seguimiento alimenta la lógica de restock por temporada del backend.
   const trackProductInterest = async (product: Product, eventType: 'view' | 'click') => {
     try {
       await apiFetch(`/api/insights/products/${product.id}/interest`, {
@@ -64,7 +67,7 @@ export default function SegmentedCatalog({
   const hierarchy = [
     { label: 'Nivel 1', value: 'Juego / franquicia' },
     { label: 'Nivel 2', value: branchLabel || 'Singles · Sellado · Accesorios · Lanzamientos · Restock' },
-    { label: 'Nivel 3', value: 'Disponibilidad · precio · señales · WhatsApp' }
+    { label: 'Nivel 3', value: 'Etiqueta tienda · disponibilidad · señales · WhatsApp' }
   ];
 
   return (

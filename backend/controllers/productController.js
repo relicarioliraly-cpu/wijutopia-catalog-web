@@ -6,8 +6,10 @@ const normalizeProduct = (product) => ({
     price: Number(product.price)
 });
 
+// Lista productos con filtros usados por las páginas jerárquicas del frontend.
+// Los filtros son opcionales para conservar compatibilidad con el catálogo general.
 const getProducts = async (req, res) => {
-    const { category, marketplace, releaseStatus, availability, search } = req.query;
+    const { category, productTag, releaseStatus, availability, search } = req.query;
     const where = [];
     const params = [];
 
@@ -15,9 +17,11 @@ const getProducts = async (req, res) => {
         where.push('(LOWER(category) LIKE ? OR LOWER(name) LIKE ?)');
         params.push(`%${String(category).toLowerCase()}%`, `%${String(category).toLowerCase()}%`);
     }
-    if (marketplace) {
-        where.push('marketplace_tag = ?');
-        params.push(marketplace);
+    // productTag filtra por etiquetas operativas internas de Wijutopia
+    // (por ejemplo: En vitrina, Restock prioritario o Preventa Wijutopia).
+    if (productTag) {
+        where.push('product_tag = ?');
+        params.push(productTag);
     }
     if (releaseStatus) {
         where.push('release_status = ?');
@@ -38,7 +42,7 @@ const getProducts = async (req, res) => {
 
     try {
         const [rows] = await db.execute(
-            `SELECT id, name, description, price, stock, image_url, category, marketplace_tag, release_status, preorder_available, created_at FROM products ${whereClause} ORDER BY created_at DESC`,
+            `SELECT id, name, description, price, stock, image_url, category, product_tag, release_status, preorder_available, created_at FROM products ${whereClause} ORDER BY created_at DESC`,
             params
         );
         return res.status(200).json({ success: true, data: rows.map(normalizeProduct) });
@@ -50,7 +54,7 @@ const getProducts = async (req, res) => {
 
 const getProductById = async (req, res) => {
     try {
-        const [rows] = await db.execute('SELECT id, name, description, price, stock, image_url, category, marketplace_tag, release_status, preorder_available, created_at FROM products WHERE id = ?', [req.params.id]);
+        const [rows] = await db.execute('SELECT id, name, description, price, stock, image_url, category, product_tag, release_status, preorder_available, created_at FROM products WHERE id = ?', [req.params.id]);
         if (!rows.length) {
             return res.status(404).json({ success: false, message: 'Producto no encontrado.' });
         }
@@ -61,16 +65,18 @@ const getProductById = async (req, res) => {
     }
 };
 
+// Al crear producto se guarda la etiqueta interna product_tag; si no llega una imagen,
+// se genera un placeholder para evitar tarjetas vacías en las páginas por juego/rama.
 const createProduct = async (req, res) => {
-    const { name, description = null, price, stock, image_url, category = 'TCG', marketplace_tag = 'Local Wijutopia', release_status = 'catalogo', preorder_available = false } = req.body;
+    const { name, description = null, price, stock, image_url, category = 'TCG', product_tag = 'En vitrina', release_status = 'catalogo', preorder_available = false } = req.body;
 
     try {
         const finalImageUrl = image_url || await fetchPlaceholderImage();
         const [result] = await db.execute(
-            'INSERT INTO products (name, description, price, stock, image_url, category, marketplace_tag, release_status, preorder_available) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [name, description, price, stock, finalImageUrl, category, marketplace_tag, release_status, preorder_available]
+            'INSERT INTO products (name, description, price, stock, image_url, category, product_tag, release_status, preorder_available) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [name, description, price, stock, finalImageUrl, category, product_tag, release_status, preorder_available]
         );
-        const [createdRows] = await db.execute('SELECT id, name, description, price, stock, image_url, category, marketplace_tag, release_status, preorder_available, created_at FROM products WHERE id = ?', [result.insertId]);
+        const [createdRows] = await db.execute('SELECT id, name, description, price, stock, image_url, category, product_tag, release_status, preorder_available, created_at FROM products WHERE id = ?', [result.insertId]);
         return res.status(201).json({ success: true, data: normalizeProduct(createdRows[0]) });
     } catch (error) {
         console.error('Error al crear producto:', error.message);
@@ -90,7 +96,7 @@ const updateProduct = async (req, res) => {
 
         const assignments = fields.map((field) => `${field} = ?`).join(', ');
         await db.execute(`UPDATE products SET ${assignments} WHERE id = ?`, [...values, req.params.id]);
-        const [updatedRows] = await db.execute('SELECT id, name, description, price, stock, image_url, category, marketplace_tag, release_status, preorder_available, created_at FROM products WHERE id = ?', [req.params.id]);
+        const [updatedRows] = await db.execute('SELECT id, name, description, price, stock, image_url, category, product_tag, release_status, preorder_available, created_at FROM products WHERE id = ?', [req.params.id]);
         return res.status(200).json({ success: true, data: normalizeProduct(updatedRows[0]) });
     } catch (error) {
         console.error('Error al actualizar producto:', error.message);

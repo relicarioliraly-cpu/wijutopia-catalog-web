@@ -85,7 +85,7 @@ export default function AdminPage() {
           stock: Number(form.get('stock')),
           image_url: form.get('image_url') || undefined,
           category: form.get('category') || 'TCG',
-          marketplace_tag: form.get('marketplace_tag') || 'Local Wijutopia',
+          product_tag: form.get('product_tag') || 'En vitrina',
           release_status: form.get('release_status') || 'catalogo',
           preorder_available: form.get('preorder_available') === 'on'
         })
@@ -175,11 +175,13 @@ export default function AdminPage() {
           <input name="stock" type="number" min="0" placeholder="Stock" className="w-full rounded-xl border p-3 text-black" required />
           <input name="image_url" type="url" placeholder="URL de imagen opcional" className="w-full rounded-xl border p-3 text-black" />
           <input name="category" placeholder="Categoría / franquicia" className="w-full rounded-xl border p-3 text-black" />
-          <select name="marketplace_tag" className="w-full rounded-xl border p-3 text-black" defaultValue="Local Wijutopia">
-            <option value="Local Wijutopia">Local Wijutopia</option>
-            <option value="TCGPlayer">TCGPlayer</option>
-            <option value="Cardmarket">Cardmarket</option>
-            <option value="TradingCardMint">TradingCardMint</option>
+          <select name="product_tag" className="w-full rounded-xl border p-3 text-black" defaultValue="En vitrina">
+            <option value="En vitrina">En vitrina</option>
+            <option value="Pedido por encargo">Pedido por encargo</option>
+            <option value="Restock prioritario">Restock prioritario</option>
+            <option value="Preventa Wijutopia">Preventa Wijutopia</option>
+            <option value="Torneo/Liga">Torneo/Liga</option>
+            <option value="Accesorio TCG">Accesorio TCG</option>
           </select>
           <select name="release_status" className="w-full rounded-xl border p-3 text-black" defaultValue="catalogo">
             <option value="catalogo">Catálogo regular</option>
@@ -210,7 +212,7 @@ export default function AdminPage() {
                 {products.map((product) => (
                   <tr key={product.id} className="border-t border-wiju-borderLight dark:border-wiju-borderDark">
                     <td className="p-3 font-bold">{product.name}</td>
-                    <td className="p-3">{product.marketplace_tag || 'Local Wijutopia'}</td>
+                    <td className="p-3">{product.product_tag || 'En vitrina'}</td>
                     <td className="p-3">{product.stock > 0 ? 'Disponible' : 'Agotado'}{product.release_status === 'lanzamiento' ? ' / Lanzamiento' : ''}</td>
                     <td className="p-3">S/ {Number(product.price).toFixed(2)}</td>
                     <td className="p-3">{product.stock}</td>

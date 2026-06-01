@@ -58,13 +58,19 @@ export const gameCatalog: GameNode[] = [
   }
 ];
 
-export const marketplaceCatalog = [
-  { slug: 'tcgplayer', label: 'TCGPlayer', description: 'Vista comparativa inspirada en listados, precios, condición y disponibilidad.' },
-  { slug: 'cardmarket', label: 'Cardmarket', description: 'Vista de referencia europea para separar cartas por juego, idioma y estado.' },
-  { slug: 'tradingcardmint', label: 'TradingCardMint', description: 'Marcador de inventario alternativo para productos sellados y cartas coleccionables.' },
-  { slug: 'local-wijutopia', label: 'Local Wijutopia', description: 'Inventario local demo, retiro en tienda simulada y solicitudes de restock.' }
+// Etiquetas propias de la operación de tienda. Reemplazan cualquier dependencia
+// conceptual de plataformas externas y sirven para ramificar páginas internas.
+export const storeTagCatalog = [
+  { slug: 'en-vitrina', label: 'En vitrina', description: 'Productos disponibles para compra inmediata en el catálogo demo de la tienda.' },
+  { slug: 'pedido-por-encargo', label: 'Pedido por encargo', description: 'Productos que el cliente puede solicitar para evaluación de compra futura.' },
+  { slug: 'restock-prioritario', label: 'Restock prioritario', description: 'Productos agotados con señales suficientes para revisión administrativa.' },
+  { slug: 'preventa-wijutopia', label: 'Preventa Wijutopia', description: 'Lanzamientos y preventas gestionadas desde el flujo interno del prototipo.' },
+  { slug: 'torneo-liga', label: 'Torneo/Liga', description: 'Productos relacionados con comunidad, ligas, torneos y juego organizado.' },
+  { slug: 'accesorio-tcg', label: 'Accesorio TCG', description: 'Sleeves, deck boxes, playmats y soporte de mesa para jugadores.' }
 ];
 
+// Ramas transversales que aparecen en la navegación global y funcionan
+// como segundo nivel jerárquico: juego -> rama -> señales/disponibilidad.
 export const productBranches = [
   { href: '/singles', label: 'Cartas sueltas', description: 'Búsqueda por juego, rareza, condición y demanda.' },
   { href: '/sealed', label: 'Producto sellado', description: 'Booster boxes, decks, bundles y colecciones.' },
@@ -74,4 +80,4 @@ export const productBranches = [
 ];
 
 export const findGame = (slug: string) => gameCatalog.find((game) => game.slug === slug);
-export const findMarketplace = (slug: string) => marketplaceCatalog.find((marketplace) => marketplace.slug === slug);
+export const findStoreTag = (slug: string) => storeTagCatalog.find((tag) => tag.slug === slug);
