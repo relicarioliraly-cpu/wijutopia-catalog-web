@@ -1,0 +1,8 @@
+# Railway/Railpack config for services whose rootDirectory is set to frontend.
+# Railpack performs dependency installation automatically, then uses these
+# commands to compile and run the Next.js production server.
+[build]
+cmd = "npm run build"
+
+[start]
+cmd = "npm start"
