@@ -15,6 +15,16 @@ Plataforma de comercio electrónico de alto rendimiento diseñada como **prototi
 
 La interfaz usa una navegación compacta con iconos SVG internos, un mapa rápido plegable para no sobrecargar la pantalla y una portada visual inspirada en una fachada morada de tienda TCG. La paleta visual toma como base los tonos morado noche, fachada violeta, letrero magenta, puerta púrpura, dorado lunar y azul vereda de la imagen de referencia. También se agregaron animaciones suaves de brillo/flotación y un interruptor de efectos sonoros opcionales para clics de navegación, carrito y confirmaciones; el sonido queda desactivado por defecto para respetar la experiencia del usuario. Las tarjetas priorizan estado, etiqueta, precio y acción principal para que el catálogo sea más legible.
 
+
+## 🚆 Despliegue en Railway / Railpack
+
+El repositorio incluye dos archivos `railpack.toml` para evitar que Railway lea únicamente el `package.json` raíz, que solo funciona como orquestador local.
+
+- Si el servicio tiene `rootDirectory = "frontend"`, Railway usa `frontend/railpack.toml`, ejecuta `npm run build` y arranca con `npm start`.
+- Si el servicio queda apuntando a la raíz del repositorio, `railpack.toml` fuerza la instalación, compilación y arranque desde `frontend/`.
+- El script `frontend` de producción usa `next start -p ${PORT:-3000}` para respetar el puerto dinámico que inyecta Railway.
+- Para backend en Railway, configure un servicio separado con `rootDirectory = "backend"` y las variables de entorno de MySQL/JWT/CAPTCHA.
+
 ## ▶️ Operación conjunta frontend + backend
 
 Para que el sitio web opere conectado al backend, configure ambos entornos y ejecute desde la raíz:
