@@ -24,7 +24,7 @@ export default function SegmentedCatalog({
   categoryMatch = [],
   storeTagLabel,
   branchLabel,
-  heroGradient = 'from-wiju-crimson to-black'
+  heroGradient = 'from-wiju-signMagenta to-black'
 }: SegmentedCatalogProps) {
   const [products, setProducts] = useState<Product[]>([]);
   const [message, setMessage] = useState('');
@@ -73,19 +73,19 @@ export default function SegmentedCatalog({
   return (
     <main className="mx-auto max-w-7xl space-y-8 px-4 py-10">
       <section className={`rounded-[2rem] bg-gradient-to-br ${heroGradient} p-8 text-white shadow-card`}>
-        {marker && <p className="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-sm font-black uppercase tracking-[0.25em] text-wiju-gold"><TagIcon className="h-4 w-4" /> {marker}</p>}
+        {marker && <p className="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-sm font-black uppercase tracking-[0.25em] text-wiju-moonGold"><TagIcon className="h-4 w-4" /> {marker}</p>}
         <h1 className="mt-4 text-4xl font-black md:text-6xl">{title}</h1>
         <p className="mt-4 max-w-4xl text-white/85">{subtitle}</p>
       </section>
 
-      {message && <p className="rounded-2xl border border-wiju-gold/50 p-4 text-sm font-semibold">{message}</p>}
+      {message && <p className="rounded-2xl border border-wiju-moonGold/50 p-4 text-sm font-semibold">{message}</p>}
 
       <section className="grid gap-4 md:grid-cols-3">
         {hierarchy.map((item) => {
           const Icon = item.icon;
           return (
-            <article key={item.label} className="flex items-center gap-4 rounded-3xl border border-wiju-borderLight bg-wiju-cardLight p-5 dark:border-wiju-borderDark dark:bg-wiju-cardDark">
-              <span className="grid h-11 w-11 place-items-center rounded-2xl bg-wiju-crimson/10 text-wiju-crimson dark:bg-wiju-gold/10 dark:text-wiju-gold"><Icon /></span>
+            <article key={item.label} className="flex items-center gap-4 rounded-3xl border border-wiju-borderLight bg-wiju-cardLight p-5 wiju-hover-lift dark:border-wiju-borderDark dark:bg-wiju-doorPurple/50">
+              <span className="grid h-11 w-11 place-items-center rounded-2xl bg-wiju-signMagenta/10 text-wiju-signMagenta dark:bg-wiju-moonGold/10 dark:text-wiju-moonGold"><Icon /></span>
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">{item.label}</p>
                 <h2 className="mt-1 text-base font-black">{item.value}</h2>
@@ -95,8 +95,8 @@ export default function SegmentedCatalog({
         })}
       </section>
 
-      <section className="grid gap-4 rounded-3xl border border-wiju-borderLight bg-wiju-cardLight p-5 dark:border-wiju-borderDark dark:bg-wiju-cardDark md:grid-cols-[1fr_auto]">
-        <label className="flex items-center gap-3 rounded-2xl border border-wiju-borderLight bg-white px-5 py-3 text-black dark:border-wiju-borderDark">
+      <section className="grid gap-4 rounded-3xl border border-wiju-borderLight bg-wiju-cardLight p-5 wiju-hover-lift dark:border-wiju-borderDark dark:bg-wiju-doorPurple/50 md:grid-cols-[1fr_auto]">
+        <label className="flex items-center gap-3 rounded-2xl border border-wiju-borderLight bg-white px-5 py-3 text-wiju-ink dark:border-wiju-borderDark">
           <SearchIcon className="text-slate-400" />
           <input
             value={query}
@@ -105,7 +105,7 @@ export default function SegmentedCatalog({
             className="w-full bg-transparent outline-none"
           />
         </label>
-        <p className="rounded-2xl bg-wiju-crimson px-5 py-3 text-center font-black text-white dark:bg-wiju-gold dark:text-black">{filteredProducts.length} resultados</p>
+        <p className="rounded-2xl bg-wiju-signMagenta px-5 py-3 text-center font-black text-white shadow-neon dark:bg-wiju-moonGold dark:text-wiju-ink">{filteredProducts.length} resultados</p>
       </section>
 
       <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">

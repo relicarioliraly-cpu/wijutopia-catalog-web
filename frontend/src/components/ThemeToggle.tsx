@@ -20,7 +20,8 @@ export default function ThemeToggle() {
     <button
       type="button"
       onClick={toggleTheme}
-      className="focus-ring rounded-full border border-wiju-borderLight px-4 py-2 text-sm font-semibold dark:border-wiju-borderDark"
+      data-sound="tap"
+      className="focus-ring rounded-full border border-wiju-borderLight px-4 py-2 text-sm font-semibold transition hover:-translate-y-0.5 hover:border-wiju-moonGold hover:text-wiju-signMagenta dark:border-wiju-borderDark dark:hover:text-wiju-moonGold"
     >
       {dark ? 'Modo claro' : 'Modo oscuro'}
     </button>

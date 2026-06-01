@@ -56,13 +56,13 @@ export default function ProductCard({
   };
 
   return (
-    <article className="overflow-hidden rounded-3xl border border-wiju-borderLight bg-wiju-cardLight shadow-card transition hover:-translate-y-1 dark:border-wiju-borderDark dark:bg-wiju-cardDark">
+    <article className="overflow-hidden rounded-3xl border border-wiju-borderLight bg-wiju-cardLight shadow-card wiju-hover-lift dark:border-wiju-borderDark dark:bg-wiju-cardDark">
       <button type="button" onClick={handleImageClick} className="relative block h-72 w-full overflow-hidden bg-black/20">
         <Image src={imageUrl} alt={product.name} fill sizes="(min-width: 1024px) 25vw, 100vw" className="object-cover transition duration-300 hover:scale-105" />
-        <span className={`absolute left-3 top-3 inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-black ${isAvailable ? 'bg-emerald-500 text-white' : 'bg-wiju-crimson text-white'}`}>
+        <span className={`absolute left-3 top-3 inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-black shadow-card ${isAvailable ? 'bg-emerald-500 text-white' : 'bg-wiju-signMagenta text-white'}`}>
           <SparkIcon className="h-3.5 w-3.5" /> {isAvailable ? 'Disponible' : 'Agotado'}
         </span>
-        {isLaunch && <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-wiju-gold px-3 py-1 text-xs font-black text-black"><ClockIcon className="h-3.5 w-3.5" /> Lanzamiento</span>}
+        {isLaunch && <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-wiju-moonGold px-3 py-1 text-xs font-black text-wiju-ink shadow-neon"><ClockIcon className="h-3.5 w-3.5" /> Lanzamiento</span>}
       </button>
       <div className="space-y-4 p-5">
         <div className="flex flex-wrap gap-2">
@@ -74,24 +74,26 @@ export default function ProductCard({
           <p className="mt-2 line-clamp-3 text-sm text-slate-600 dark:text-slate-300">{product.description || 'Producto TCG disponible para la comunidad de Trujillo.'}</p>
         </div>
         <div className="flex items-center justify-between">
-          <span className="text-2xl font-black text-wiju-crimson dark:text-wiju-gold">S/ {Number(product.price).toFixed(2)}</span>
-          <span className="rounded-full bg-wiju-crimson/10 px-3 py-1 text-xs font-bold text-wiju-crimson dark:bg-wiju-gold/10 dark:text-wiju-gold">Stock: {product.stock}</span>
+          <span className="text-2xl font-black text-wiju-signMagenta dark:text-wiju-moonGold">S/ {Number(product.price).toFixed(2)}</span>
+          <span className="rounded-full bg-wiju-signMagenta/10 px-3 py-1 text-xs font-bold text-wiju-signMagenta dark:bg-wiju-moonGold/10 dark:text-wiju-moonGold">Stock: {product.stock}</span>
         </div>
         {isAvailable ? (
           <button
             type="button"
             onClick={handleAddToCart}
-            className="focus-ring inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-wiju-crimson px-4 py-3 font-black text-white dark:bg-wiju-gold dark:text-black"
+            data-sound="cart"
+            className="focus-ring inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-wiju-signMagenta px-4 py-3 font-black text-white shadow-neon transition hover:-translate-y-0.5 dark:bg-wiju-moonGold dark:text-wiju-ink"
           >
             <CartIcon className="h-5 w-5" /> Añadir al carrito
           </button>
         ) : activeRestock ? (
           <div className="space-y-2">
-            <p className="rounded-2xl bg-wiju-gold/15 p-3 text-xs font-semibold">Solicitud en espera: se comparará con vistas, clics y mensajes oficiales de WhatsApp de la temporada.</p>
+            <p className="rounded-2xl bg-wiju-moonGold/15 p-3 text-xs font-semibold">Solicitud en espera: se comparará con vistas, clics y mensajes oficiales de WhatsApp de la temporada.</p>
             <button
               type="button"
               onClick={() => onCancelRestock?.(product, activeRestock)}
-              className="focus-ring w-full rounded-2xl border border-wiju-crimson px-4 py-3 font-black text-wiju-crimson dark:border-wiju-gold dark:text-wiju-gold"
+              data-sound="tap"
+              className="focus-ring w-full rounded-2xl border border-wiju-signMagenta px-4 py-3 font-black text-wiju-signMagenta dark:border-wiju-moonGold dark:text-wiju-moonGold"
             >
               Cancelar stock/restock
             </button>
@@ -100,7 +102,8 @@ export default function ProductCard({
           <button
             type="button"
             onClick={() => onRestockRequest?.(product)}
-            className="focus-ring w-full rounded-2xl border border-wiju-crimson px-4 py-3 font-black text-wiju-crimson dark:border-wiju-gold dark:text-wiju-gold"
+            data-sound="success"
+            className="focus-ring w-full rounded-2xl border border-wiju-signMagenta px-4 py-3 font-black text-wiju-signMagenta dark:border-wiju-moonGold dark:text-wiju-moonGold"
           >
             Pedir stock/restock
           </button>
@@ -109,7 +112,8 @@ export default function ProductCard({
           <button
             type="button"
             onClick={() => onPreorderRequest?.(product)}
-            className="focus-ring inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-black px-4 py-3 font-black text-wiju-gold dark:bg-white dark:text-wiju-crimson"
+            data-sound="success"
+            className="focus-ring inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-black px-4 py-3 font-black text-wiju-moonGold shadow-neon dark:bg-white dark:text-wiju-signMagenta"
           >
             <ClockIcon className="h-5 w-5" /> Pedir lanzamiento
           </button>
