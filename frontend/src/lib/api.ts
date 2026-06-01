@@ -32,9 +32,10 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
     headers,
     cache: 'no-store'
   });
-  const payload = await response.json();
+  const contentType = response.headers.get('content-type') || '';
+  const payload = contentType.includes('application/json') ? await response.json() : { message: await response.text() };
   if (!response.ok) {
-    throw new Error(payload.message || 'La solicitud no pudo completarse.');
+    throw new Error(payload.message || payload.error || 'La solicitud no pudo completarse.');
   }
   return payload as T;
 }

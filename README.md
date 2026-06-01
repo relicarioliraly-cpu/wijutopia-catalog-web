@@ -9,6 +9,33 @@ Plataforma de comercio electrónico de alto rendimiento diseñada como **prototi
 - Frontend en Producción: `https://wijutopia-tcg.vercel.app`
 - API REST Backend: `https://wijutopia-backend.onrender.com`
 
+
+## ▶️ Operación conjunta frontend + backend
+
+Para que el sitio web opere conectado al backend, configure ambos entornos y ejecute desde la raíz:
+
+```bash
+npm run install:all
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env.local
+npm run dev
+```
+
+- Backend Express: `http://localhost:5000`.
+- Frontend Next.js: `http://localhost:3000`.
+- El frontend usa `NEXT_PUBLIC_API_URL` para consumir `/api/health`, `/api/products`, `/api/metrics` y `/api/insights`.
+- La barra superior muestra un indicador de integración frontend ↔ backend consultando `GET /api/health`.
+- Si el indicador aparece en rojo, revise que el backend esté levantado, que MySQL esté configurado y que `NEXT_PUBLIC_API_URL` apunte al puerto correcto.
+
+Comandos útiles desde la raíz:
+
+```bash
+npm run dev:backend
+npm run dev:frontend
+npm run lint
+npm run typecheck
+```
+
 ## 🧱 Arquitectura
 
 ```text
