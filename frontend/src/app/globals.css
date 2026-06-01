@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+body {
+  @apply min-h-screen bg-wiju-lightBg text-wiju-textLight transition-colors dark:bg-wiju-darkBg dark:text-wiju-textDark;
+}
+
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-wiju-gold focus:ring-offset-2 focus:ring-offset-wiju-darkBg;
+}
