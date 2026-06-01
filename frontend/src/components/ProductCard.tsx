@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import Image from 'next/image';
+import { CartIcon, ClockIcon, SparkIcon, TagIcon } from '@/components/Icons';
 import { Product } from '@/lib/api';
 import { useTracker } from '@/hooks/useTracker';
 
@@ -58,14 +59,14 @@ export default function ProductCard({
     <article className="overflow-hidden rounded-3xl border border-wiju-borderLight bg-wiju-cardLight shadow-card transition hover:-translate-y-1 dark:border-wiju-borderDark dark:bg-wiju-cardDark">
       <button type="button" onClick={handleImageClick} className="relative block h-72 w-full overflow-hidden bg-black/20">
         <Image src={imageUrl} alt={product.name} fill sizes="(min-width: 1024px) 25vw, 100vw" className="object-cover transition duration-300 hover:scale-105" />
-        <span className={`absolute left-3 top-3 rounded-full px-3 py-1 text-xs font-black ${isAvailable ? 'bg-emerald-500 text-white' : 'bg-wiju-crimson text-white'}`}>
-          {isAvailable ? 'Disponible' : 'Agotado'}
+        <span className={`absolute left-3 top-3 inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-black ${isAvailable ? 'bg-emerald-500 text-white' : 'bg-wiju-crimson text-white'}`}>
+          <SparkIcon className="h-3.5 w-3.5" /> {isAvailable ? 'Disponible' : 'Agotado'}
         </span>
-        {isLaunch && <span className="absolute right-3 top-3 rounded-full bg-wiju-gold px-3 py-1 text-xs font-black text-black">Lanzamiento</span>}
+        {isLaunch && <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-wiju-gold px-3 py-1 text-xs font-black text-black"><ClockIcon className="h-3.5 w-3.5" /> Lanzamiento</span>}
       </button>
       <div className="space-y-4 p-5">
         <div className="flex flex-wrap gap-2">
-          <span className="rounded-full border border-wiju-borderLight px-3 py-1 text-xs font-bold dark:border-wiju-borderDark">{product.product_tag || 'En vitrina'}</span>
+          <span className="inline-flex items-center gap-1 rounded-full border border-wiju-borderLight px-3 py-1 text-xs font-bold dark:border-wiju-borderDark"><TagIcon className="h-3.5 w-3.5" /> {product.product_tag || 'En vitrina'}</span>
           <span className="rounded-full border border-wiju-borderLight px-3 py-1 text-xs font-bold dark:border-wiju-borderDark">{product.category || 'TCG'}</span>
         </div>
         <div>
@@ -80,9 +81,9 @@ export default function ProductCard({
           <button
             type="button"
             onClick={handleAddToCart}
-            className="focus-ring w-full rounded-2xl bg-wiju-crimson px-4 py-3 font-black text-white dark:bg-wiju-gold dark:text-black"
+            className="focus-ring inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-wiju-crimson px-4 py-3 font-black text-white dark:bg-wiju-gold dark:text-black"
           >
-            Añadir al carrito
+            <CartIcon className="h-5 w-5" /> Añadir al carrito
           </button>
         ) : activeRestock ? (
           <div className="space-y-2">
@@ -108,9 +109,9 @@ export default function ProductCard({
           <button
             type="button"
             onClick={() => onPreorderRequest?.(product)}
-            className="focus-ring w-full rounded-2xl bg-black px-4 py-3 font-black text-wiju-gold dark:bg-white dark:text-wiju-crimson"
+            className="focus-ring inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-black px-4 py-3 font-black text-wiju-gold dark:bg-white dark:text-wiju-crimson"
           >
-            Pedir lanzamiento
+            <ClockIcon className="h-5 w-5" /> Pedir lanzamiento
           </button>
         )}
       </div>

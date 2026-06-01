@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { ChartIcon } from '@/components/Icons';
 import { API_URL, apiFetch } from '@/lib/api';
 
 type HealthPayload = {
@@ -39,7 +40,7 @@ export default function BackendStatus() {
     <div className="mx-auto max-w-7xl px-4 pt-4">
       <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-wiju-borderLight bg-wiju-cardLight px-4 py-3 text-sm shadow-card dark:border-wiju-borderDark dark:bg-wiju-cardDark">
         <span className={`h-3 w-3 rounded-full ${color}`} aria-hidden="true" />
-        <strong>Integración frontend ↔ backend:</strong>
+        <ChartIcon className="h-4 w-4 text-wiju-crimson dark:text-wiju-gold" /><strong>Integración frontend ↔ backend:</strong>
         <span className="text-slate-600 dark:text-slate-300">{detail}</span>
       </div>
     </div>

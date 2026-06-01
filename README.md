@@ -10,6 +10,11 @@ Plataforma de comercio electrónico de alto rendimiento diseñada como **prototi
 - API REST Backend: `https://wijutopia-backend.onrender.com`
 
 
+
+## 🎨 Limpieza visual e iconografía
+
+La interfaz usa una navegación compacta con iconos SVG internos, un mapa rápido plegable para no sobrecargar la pantalla y una portada visual inspirada en una fachada morada de tienda TCG. Las tarjetas priorizan estado, etiqueta, precio y acción principal para que el catálogo sea más legible.
+
 ## ▶️ Operación conjunta frontend + backend
 
 Para que el sitio web opere conectado al backend, configure ambos entornos y ejecute desde la raíz:
