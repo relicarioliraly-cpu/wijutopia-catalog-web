@@ -1,21 +1,19 @@
 'use client';
 
 import { FormEvent, useEffect, useMemo, useState } from 'react';
+import AuthProfileCard from '@/components/AuthProfileCard';
 import ProductCard from '@/components/ProductCard';
 import { apiFetch, Product } from '@/lib/api';
 import { useTracker } from '@/hooks/useTracker';
 
 type CartItem = Product & { quantity: number };
 type ActiveRestock = { id: number; customerEmail: string; status: string };
-type CaptchaState = { captchaImage: string; captchaToken: string } | null;
 
 export default function ClientPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [activeRestocks, setActiveRestocks] = useState<Record<number, ActiveRestock>>({});
   const [query, setQuery] = useState('');
-  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
-  const [captcha, setCaptcha] = useState<CaptchaState>(null);
   const [message, setMessage] = useState('');
   const { trackClick } = useTracker();
 
@@ -43,11 +41,6 @@ export default function ClientPage() {
     window.localStorage.setItem('wijutopia_restock_requests', JSON.stringify(activeRestocks));
   }, [activeRestocks]);
 
-  useEffect(() => {
-    if (authMode === 'register') {
-      fetchCaptcha();
-    }
-  }, [authMode]);
 
   const filteredProducts = useMemo(() => {
     const normalizedQuery = query.toLowerCase();
@@ -55,11 +48,6 @@ export default function ClientPage() {
   }, [products, query]);
 
   const cartTotal = cart.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0);
-
-  const fetchCaptcha = async () => {
-    const payload = await apiFetch<{ success: boolean; captchaImage: string; captchaToken: string }>('/api/auth/captcha');
-    setCaptcha({ captchaImage: payload.captchaImage, captchaToken: payload.captchaToken });
-  };
 
   const addToCart = (product: Product) => {
     setCart((current) => {
@@ -180,36 +168,6 @@ export default function ClientPage() {
     }
   };
 
-  const handleAuth = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const form = new FormData(event.currentTarget);
-    const path = authMode === 'login' ? '/api/auth/login' : '/api/auth/register';
-    const body = authMode === 'login'
-      ? { email: form.get('email'), password: form.get('password') }
-      : {
-          name: form.get('name'),
-          email: form.get('email'),
-          password: form.get('password'),
-          captchaAnswer: form.get('captchaAnswer'),
-          captchaToken: captcha?.captchaToken
-        };
-
-    try {
-      const payload = await apiFetch<{ success: boolean; token: string; user: { email: string; role: string } }>(path, {
-        method: 'POST',
-        body: JSON.stringify(body)
-      });
-      window.localStorage.setItem('wijutopia_token', payload.token);
-      window.localStorage.setItem('wijutopia_user', JSON.stringify(payload.user));
-      setMessage(`Sesión iniciada como ${payload.user.email} (${payload.user.role}).`);
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Error de autenticación.');
-      if (authMode === 'register') {
-        await fetchCaptcha();
-      }
-    }
-  };
-
   return (
     <main className="mx-auto max-w-7xl space-y-10 px-4 py-10">
       <section className="rounded-[2rem] bg-gradient-to-br from-wiju-crimson to-black p-8 text-white shadow-card dark:from-wiju-cardDark dark:to-black">
@@ -276,24 +234,10 @@ export default function ClientPage() {
             <button type="button" onClick={() => setCart([])} className="mt-4 w-full rounded-2xl border border-wiju-borderLight px-4 py-3 font-bold dark:border-wiju-borderDark">Vaciar carrito</button>
           </section>
 
-          <section className="rounded-3xl border border-wiju-borderLight bg-wiju-cardLight p-6 shadow-card dark:border-wiju-borderDark dark:bg-wiju-cardDark">
-            <div className="flex gap-2">
-              <button type="button" onClick={() => setAuthMode('login')} className="rounded-full bg-wiju-crimson px-4 py-2 text-sm font-bold text-white">Login</button>
-              <button type="button" onClick={() => setAuthMode('register')} className="rounded-full border border-wiju-borderLight px-4 py-2 text-sm font-bold dark:border-wiju-borderDark">Registro</button>
-            </div>
-            <form onSubmit={handleAuth} className="mt-5 space-y-3">
-              {authMode === 'register' && <input name="name" placeholder="Nombre" className="w-full rounded-xl border p-3 text-black" required />}
-              <input name="email" type="email" placeholder="Correo" className="w-full rounded-xl border p-3 text-black" required />
-              <input name="password" type="password" placeholder="Contraseña" className="w-full rounded-xl border p-3 text-black" required />
-              {authMode === 'register' && captcha && (
-                <div className="space-y-2">
-                  <img src={captcha.captchaImage} alt="Captcha visual" className="rounded-xl border border-wiju-borderDark" />
-                  <input name="captchaAnswer" placeholder="Texto del captcha" className="w-full rounded-xl border p-3 text-black" required />
-                </div>
-              )}
-              <button className="w-full rounded-2xl bg-wiju-gold px-4 py-3 font-black text-black" type="submit">Enviar</button>
-            </form>
-          </section>
+          <AuthProfileCard
+            title="Login y registro del cliente"
+            description="Esta sección ahora funciona como profile: entra o crea cuenta para vincular carrito, pedidos de stock/restock y tu opinión del catálogo."
+          />
         </aside>
       </section>
 
