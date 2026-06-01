@@ -12,8 +12,7 @@ export default function MarketplacePage({ params }: { params: { slug: string } }
       title={`Referencia ${marketplace.label}`}
       subtitle={marketplace.description}
       marker={marketplace.label}
-      marketplaceLabel={marketplace.label as 'TCGPlayer' | 'Cardmarket' | 'TradingCardMint' | 'Local Wijutopia'}
-      heroGradient="from-slate-900 to-wiju-crimson"
+      heroGradient="from-slate-900 to-wiju-signMagenta"
     />
   );
 }

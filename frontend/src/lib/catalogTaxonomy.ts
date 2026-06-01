@@ -81,3 +81,13 @@ export const productBranches = [
 
 export const findGame = (slug: string) => gameCatalog.find((game) => game.slug === slug);
 export const findStoreTag = (slug: string) => storeTagCatalog.find((tag) => tag.slug === slug);
+
+// Marketplace reference entries used by the /marketplaces/[slug] pages.
+export const marketplaceCatalog = [
+  { slug: 'tcgplayer', label: 'TCGPlayer', description: 'Referencia de precios y disponibilidad en TCGPlayer para comparación.' },
+  { slug: 'cardmarket', label: 'Cardmarket', description: 'Referencia de precios y disponibilidad en Cardmarket para comparación.' },
+  { slug: 'tradingcardmint', label: 'TradingCardMint', description: 'Referencia de precios y disponibilidad en TradingCardMint para comparación.' },
+  { slug: 'local-wijutopia', label: 'Local Wijutopia', description: 'Catálogo interno de la tienda Wijutopia con precios y stock propios.' }
+];
+
+export const findMarketplace = (slug: string) => marketplaceCatalog.find((m) => m.slug === slug);
