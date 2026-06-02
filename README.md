@@ -1,6 +1,6 @@
 # Wijutopia TCG E-Commerce - Trujillo, Perú 🇵🇪
 
-Plataforma de comercio electrónico de alto rendimiento diseñada como **prototipo académico** para una tienda TCG inspirada en Wijutopia, comunidad de juegos de cartas coleccionables de Trujillo, Perú. El sistema integra un frontend moderno con Next.js y Tailwind CSS, un backend RESTful en Express.js y persistencia relacional en MySQL.
+Plataforma de comercio electrónico de alto rendimiento diseñada como **prototipo académico** para una tienda TCG inspirada en Wijutopia, comunidad de juegos de cartas coleccionables de Trujillo, Perú. El sistema integra un frontend moderno con Next.js y Tailwind CSS, un backend RESTful en Express.js y persistencia en MongoDB Atlas.
 
 > **Aviso legal:** este repositorio no representa una página oficial de Wijutopia, Wiju World ni de las franquicias Pokémon, Yu-Gi-Oh!, Digimon, Bandai, One Piece o similares. Es un examen de prueba sin pagos reales ni inventario oficial.
 
@@ -23,7 +23,7 @@ El repositorio incluye dos archivos `railpack.toml` para evitar que Railway lea 
 - Si el servicio tiene `rootDirectory = "frontend"`, Railway usa `frontend/railpack.toml`, ejecuta `npm run build` y arranca con `npm start`.
 - Si el servicio queda apuntando a la raíz del repositorio, `railpack.toml` fuerza la instalación, compilación y arranque desde `frontend/`.
 - El script `frontend` de producción usa `next start -p ${PORT:-3000}` para respetar el puerto dinámico que inyecta Railway.
-- Para backend en Railway, configure un servicio separado con `rootDirectory = "backend"` y las variables de entorno de MySQL/JWT/CAPTCHA.
+- Para backend en Railway, configure un servicio separado con `rootDirectory = "backend"` y las variables de entorno de MongoDB/JWT/CAPTCHA.
 
 ## ▶️ Operación conjunta frontend + backend
 
@@ -40,7 +40,7 @@ npm run dev
 - Frontend Next.js: `http://localhost:3000`.
 - El frontend usa `NEXT_PUBLIC_API_URL` para consumir `/api/health`, `/api/products`, `/api/metrics` y `/api/insights`.
 - La barra superior muestra un indicador de integración frontend ↔ backend consultando `GET /api/health`.
-- Si el indicador aparece en rojo, revise que el backend esté levantado, que MySQL esté configurado y que `NEXT_PUBLIC_API_URL` apunte al puerto correcto.
+- Si el indicador aparece en rojo, revise que el backend esté levantado, que MongoDB Atlas esté configurado y que `NEXT_PUBLIC_API_URL` apunte al puerto correcto.
 
 Comandos útiles desde la raíz:
 

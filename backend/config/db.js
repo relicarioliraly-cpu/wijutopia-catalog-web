@@ -1,28 +1,58 @@
-const mysql = require('mysql2/promise');
+const { MongoClient, ObjectId } = require('mongodb');
 const dotenv = require('dotenv');
 
 dotenv.config();
 
-const poolConfig = process.env.DB_URL
-    ? {
-        uri: process.env.DB_URL,
-        waitForConnections: true,
-        connectionLimit: 10,
-        queueLimit: 0,
-        decimalNumbers: true
+const uri = process.env.MONGODB_URI || process.env.DB_URL || 'mongodb://localhost:27017';
+const dbName = process.env.MONGODB_DB || 'wijutopia_db';
+
+const client = new MongoClient(uri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+});
+
+let db;
+
+const ensureIndexes = async () => {
+    const usersCollection = db.collection('users');
+    await usersCollection.createIndex({ email: 1 }, { unique: true });
+
+    const restockRequests = db.collection('restock_requests');
+    await restockRequests.createIndex(
+        { product_id: 1, customer_email: 1, season_key: 1 },
+        { unique: true, partialFilterExpression: { customer_email: { $exists: true } } }
+    );
+
+    const interestStats = db.collection('product_interest_stats');
+    await interestStats.createIndex({ product_id: 1, season_key: 1 }, { unique: true });
+
+    const clickAnalytics = db.collection('click_analytics');
+    await clickAnalytics.createIndex({ element_identifier: 1 }, { unique: true });
+};
+
+const connect = async () => {
+    if (!db) {
+        await client.connect();
+        db = client.db(dbName);
+        await ensureIndexes();
     }
-    : {
-        host: process.env.DB_HOST || 'localhost',
-        user: process.env.DB_USER || 'root',
-        password: process.env.DB_PASSWORD || '',
-        database: process.env.DB_NAME || 'wijutopia_db',
-        port: Number(process.env.DB_PORT || 3306),
-        waitForConnections: true,
-        connectionLimit: 10,
-        queueLimit: 0,
-        decimalNumbers: true
-    };
+    return db;
+};
 
-const pool = mysql.createPool(poolConfig);
+const collection = (name) => {
+    if (!db) {
+        throw new Error('MongoDB no está conectado. Llama a connect() antes de usar collection().');
+    }
+    return db.collection(name);
+};
 
-module.exports = pool;
+const objectId = (value) => {
+    if (!value) return null;
+    return typeof value === 'string' && ObjectId.isValid(value) ? new ObjectId(value) : value;
+};
+
+module.exports = {
+    connect,
+    collection,
+    objectId
+};

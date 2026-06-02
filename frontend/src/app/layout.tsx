@@ -7,7 +7,7 @@ import SiteNav from '@/components/SiteNav';
 
 export const metadata: Metadata = {
   title: 'Wijutopia TCG E-Commerce | Prototipo Académico',
-  description: 'Plataforma full-stack de prueba para comercio electrónico TCG con Next.js, Express y MySQL.'
+  description: 'Plataforma full-stack de prueba para comercio electrónico TCG con Next.js, Express y MongoDB Atlas.'
 };
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {

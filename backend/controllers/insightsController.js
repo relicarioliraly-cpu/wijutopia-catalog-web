@@ -15,26 +15,27 @@ const getSeasonEndDate = (date = new Date()) => {
 const normalizeEmail = (email) => String(email || '').trim().toLowerCase();
 
 const ensureInterestStats = async (productId, seasonKey) => {
-    await db.execute(
-        `INSERT INTO product_interest_stats (product_id, season_key)
-         VALUES (?, ?)
-         ON DUPLICATE KEY UPDATE product_id = product_id`,
-        [productId, seasonKey]
+    const statsCollection = db.collection('product_interest_stats');
+    const filter = { product_id: db.objectId(productId), season_key: seasonKey };
+    await statsCollection.updateOne(
+        filter,
+        {
+            $setOnInsert: {
+                product_views: 0,
+                product_clicks: 0,
+                whatsapp_messages: 0,
+                restock_threshold: 25,
+                launch_threshold: 0,
+                created_at: new Date()
+            }
+        },
+        { upsert: true }
     );
-
-    const [rows] = await db.execute(
-        `SELECT product_id, season_key, product_views, product_clicks, whatsapp_messages,
-                restock_threshold, launch_threshold,
-                (product_views + product_clicks + whatsapp_messages) AS total_interest
-         FROM product_interest_stats
-         WHERE product_id = ? AND season_key = ?`,
-        [productId, seasonKey]
-    );
-    return rows[0];
+    return statsCollection.findOne(filter);
 };
 
 const evaluateRestockStatus = (stats) => {
-    const totalInterest = Number(stats?.total_interest || 0);
+    const totalInterest = Number(stats?.product_views || 0) + Number(stats?.product_clicks || 0) + Number(stats?.whatsapp_messages || 0);
     const threshold = Number(stats?.restock_threshold || 25);
     return {
         status: totalInterest >= threshold ? 'elegible_admin' : 'en_espera',
@@ -46,16 +47,22 @@ const evaluateRestockStatus = (stats) => {
     };
 };
 
-
 const refreshRestockEligibility = async (productId, seasonKey) => {
     const stats = await ensureInterestStats(productId, seasonKey);
     const evaluation = evaluateRestockStatus(stats);
     if (evaluation.status === 'elegible_admin') {
-        await db.execute(
-            `UPDATE restock_requests
-             SET status = 'elegible_admin', waiting_message = ?, interest_snapshot = ?, threshold_snapshot = ?
-             WHERE product_id = ? AND season_key = ? AND status = 'en_espera'`,
-            [evaluation.waitingMessage, evaluation.totalInterest, evaluation.threshold, productId, seasonKey]
+        const restockRequests = db.collection('restock_requests');
+        await restockRequests.updateMany(
+            { product_id: db.objectId(productId), season_key: seasonKey, status: 'en_espera' },
+            {
+                $set: {
+                    status: 'elegible_admin',
+                    waiting_message: evaluation.waitingMessage,
+                    interest_snapshot: evaluation.totalInterest,
+                    threshold_snapshot: evaluation.threshold,
+                    updated_at: new Date()
+                }
+            }
         );
     }
     return { stats, evaluation };
@@ -71,13 +78,20 @@ const recordProductInterest = async (req, res) => {
     }
 
     try {
-        const column = eventType === 'view' ? 'product_views' : 'product_clicks';
-        await db.execute(
-            `INSERT INTO product_interest_stats (product_id, season_key, ${column})
-             VALUES (?, ?, 1)
-             ON DUPLICATE KEY UPDATE ${column} = ${column} + 1`,
-            [id, seasonKey]
-        );
+        const statsCollection = db.collection('product_interest_stats');
+        const filter = { product_id: db.objectId(id), season_key: seasonKey };
+        const update = {
+            $setOnInsert: {
+                product_views: 0,
+                product_clicks: 0,
+                whatsapp_messages: 0,
+                restock_threshold: 25,
+                launch_threshold: 0,
+                created_at: new Date()
+            },
+            $inc: { [eventType === 'view' ? 'product_views' : 'product_clicks']: 1 }
+        };
+        await statsCollection.updateOne(filter, update, { upsert: true });
         const { stats, evaluation } = await refreshRestockEligibility(id, seasonKey);
         return res.status(200).json({ success: true, data: { ...stats, restockStatus: evaluation.status } });
     } catch (error) {
@@ -93,11 +107,22 @@ const addWhatsappInterest = async (req, res) => {
     const normalizedCount = Math.max(1, Number(messageCount) || 1);
 
     try {
-        await db.execute(
-            `INSERT INTO product_interest_stats (product_id, season_key, whatsapp_messages)
-             VALUES (?, ?, ?)
-             ON DUPLICATE KEY UPDATE whatsapp_messages = whatsapp_messages + VALUES(whatsapp_messages)`,
-            [id, seasonKey, normalizedCount]
+        const statsCollection = db.collection('product_interest_stats');
+        const filter = { product_id: db.objectId(id), season_key: seasonKey };
+        await statsCollection.updateOne(
+            filter,
+            {
+                $setOnInsert: {
+                    product_views: 0,
+                    product_clicks: 0,
+                    whatsapp_messages: 0,
+                    restock_threshold: 25,
+                    launch_threshold: 0,
+                    created_at: new Date()
+                },
+                $inc: { whatsapp_messages: normalizedCount }
+            },
+            { upsert: true }
         );
         const { stats, evaluation } = await refreshRestockEligibility(id, seasonKey);
         return res.status(200).json({ success: true, message: 'Mensajes oficiales de WhatsApp agregados al análisis.', data: { ...stats, restockStatus: evaluation.status } });
@@ -118,48 +143,58 @@ const requestRestock = async (req, res) => {
     }
 
     try {
-        const [productRows] = await db.execute('SELECT id FROM products WHERE id = ?', [id]);
-        if (!productRows.length) {
+        const products = db.collection('products');
+        const restockRequests = db.collection('restock_requests');
+        const product = await products.findOne({ _id: db.objectId(id) });
+        if (!product) {
             return res.status(404).json({ success: false, message: 'Producto no encontrado para restock.' });
         }
 
         const stats = await ensureInterestStats(id, seasonKey);
         const evaluation = evaluateRestockStatus(stats);
 
-        try {
-            const [result] = await db.execute(
-                `INSERT INTO restock_requests
-                 (product_id, customer_email, requested_quantity, season_key, source, status, waiting_message, threshold_snapshot, interest_snapshot)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-                [id, normalizedEmail, requestedQuantity, seasonKey, source, evaluation.status, evaluation.waitingMessage, evaluation.threshold, evaluation.totalInterest]
-            );
-
-            return res.status(201).json({
-                success: true,
-                message: evaluation.waitingMessage,
+        const existingRequest = await restockRequests.findOne({ product_id: db.objectId(id), customer_email: normalizedEmail, season_key: seasonKey });
+        if (existingRequest) {
+            return res.status(409).json({
+                success: false,
+                message: 'Ya existe un intento de stock/restock para esta cuenta durante la temporada actual. Puedes cancelarlo desde el botón de cancelar.',
                 data: {
-                    id: result.insertId,
-                    status: evaluation.status,
-                    seasonKey,
-                    seasonEndsAt: getSeasonEndDate(),
-                    totalInterest: evaluation.totalInterest,
-                    threshold: evaluation.threshold
+                    id: existingRequest._id.toString(),
+                    status: existingRequest.status,
+                    waiting_message: existingRequest.waiting_message,
+                    season_key: existingRequest.season_key,
+                    interest_snapshot: existingRequest.interest_snapshot,
+                    threshold_snapshot: existingRequest.threshold_snapshot
                 }
             });
-        } catch (error) {
-            if (error.code === 'ER_DUP_ENTRY') {
-                const [existingRows] = await db.execute(
-                    'SELECT id, status, waiting_message, season_key, interest_snapshot, threshold_snapshot FROM restock_requests WHERE product_id = ? AND customer_email = ? AND season_key = ?',
-                    [id, normalizedEmail, seasonKey]
-                );
-                return res.status(409).json({
-                    success: false,
-                    message: 'Ya existe un intento de stock/restock para esta cuenta durante la temporada actual. Puedes cancelarlo desde el botón de cancelar.',
-                    data: existingRows[0]
-                });
-            }
-            throw error;
         }
+
+        const result = await restockRequests.insertOne({
+            product_id: db.objectId(id),
+            customer_email: normalizedEmail,
+            requested_quantity: Number(requestedQuantity || 1),
+            season_key: seasonKey,
+            source,
+            status: evaluation.status,
+            waiting_message: evaluation.waitingMessage,
+            threshold_snapshot: evaluation.threshold,
+            interest_snapshot: evaluation.totalInterest,
+            created_at: new Date(),
+            updated_at: new Date()
+        });
+
+        return res.status(201).json({
+            success: true,
+            message: evaluation.waitingMessage,
+            data: {
+                id: result.insertedId.toString(),
+                status: evaluation.status,
+                seasonKey,
+                seasonEndsAt: getSeasonEndDate(),
+                totalInterest: evaluation.totalInterest,
+                threshold: evaluation.threshold
+            }
+        });
     } catch (error) {
         console.error('Error al registrar restock:', error.message);
         return res.status(500).json({ success: false, message: 'Error interno del servidor.' });
@@ -176,14 +211,20 @@ const cancelRestock = async (req, res) => {
     }
 
     try {
-        const [result] = await db.execute(
-            `UPDATE restock_requests
-             SET status = 'cancelado', cancelled_at = CURRENT_TIMESTAMP, waiting_message = 'Solicitud cancelada por el cliente.'
-             WHERE id = ? AND customer_email = ? AND status NOT IN ('cancelado', 'resuelto')`,
-            [requestId, normalizedEmail]
+        const restockRequests = db.collection('restock_requests');
+        const result = await restockRequests.updateOne(
+            { _id: db.objectId(requestId), customer_email: normalizedEmail, status: { $nin: ['cancelado', 'resuelto'] } },
+            {
+                $set: {
+                    status: 'cancelado',
+                    cancelled_at: new Date(),
+                    waiting_message: 'Solicitud cancelada por el cliente.',
+                    updated_at: new Date()
+                }
+            }
         );
 
-        if (result.affectedRows === 0) {
+        if (result.matchedCount === 0) {
             return res.status(404).json({ success: false, message: 'No se encontró una solicitud activa para cancelar.' });
         }
 
@@ -201,10 +242,16 @@ const requestLaunch = async (req, res) => {
     }
 
     try {
-        await db.execute(
-            'INSERT INTO launch_requests (product_name, franchise, customer_email, requested_quantity, notes) VALUES (?, ?, ?, ?, ?)',
-            [productName, franchise, customerEmail, requestedQuantity, notes]
-        );
+        const launchRequests = db.collection('launch_requests');
+        await launchRequests.insertOne({
+            product_name: productName,
+            franchise,
+            customer_email: customerEmail,
+            requested_quantity: Number(requestedQuantity || 1),
+            notes,
+            status: 'pendiente',
+            created_at: new Date()
+        });
         return res.status(201).json({ success: true, message: 'Pedido de lanzamiento registrado.' });
     } catch (error) {
         console.error('Error al registrar lanzamiento:', error.message);
@@ -223,7 +270,7 @@ const submitCustomerResearch = async (req, res) => {
         comments = null
     } = req.body;
 
-    if (!favoriteFranchise || !satisfactionScore) {
+    if (!favoriteFranchise || satisfactionScore === undefined || satisfactionScore === null) {
         return res.status(400).json({ success: false, message: 'Franquicia favorita y satisfacción son obligatorias.' });
     }
 
@@ -233,12 +280,17 @@ const submitCustomerResearch = async (req, res) => {
     }
 
     try {
-        await db.execute(
-            `INSERT INTO customer_research
-             (customer_email, favorite_franchise, satisfaction_score, preferred_budget, play_style, trivia_answer, comments)
-             VALUES (?, ?, ?, ?, ?, ?, ?)`,
-            [customerEmail, favoriteFranchise, numericScore, preferredBudget, playStyle, triviaAnswer, comments]
-        );
+        const research = db.collection('customer_research');
+        await research.insertOne({
+            customer_email: customerEmail,
+            favorite_franchise: favoriteFranchise,
+            satisfaction_score: numericScore,
+            preferred_budget: preferredBudget !== null ? Number(preferredBudget) : null,
+            play_style: playStyle,
+            trivia_answer: triviaAnswer,
+            comments,
+            created_at: new Date()
+        });
         return res.status(201).json({ success: true, message: 'Investigación de cliente registrada.' });
     } catch (error) {
         console.error('Error al guardar investigación:', error.message);
@@ -250,30 +302,118 @@ const getBusinessInsights = async (req, res) => {
     const seasonKey = getSeasonKey();
 
     try {
-        const [restockRows] = await db.execute(`
-            SELECT rr.id, rr.product_id, p.name AS product_name, rr.customer_email, rr.requested_quantity,
-                   rr.season_key, rr.source, rr.status, rr.waiting_message, rr.threshold_snapshot,
-                   rr.interest_snapshot, rr.cancelled_at, rr.created_at, rr.updated_at
-            FROM restock_requests rr
-            INNER JOIN products p ON p.id = rr.product_id
-            ORDER BY rr.created_at DESC
-            LIMIT 50
-        `);
-        const [interestRows] = await db.execute(`
-            SELECT pis.product_id, p.name AS product_name, pis.season_key, pis.product_views,
-                   pis.product_clicks, pis.whatsapp_messages, pis.restock_threshold,
-                   (pis.product_views + pis.product_clicks + pis.whatsapp_messages) AS total_interest,
-                   CASE WHEN (pis.product_views + pis.product_clicks + pis.whatsapp_messages) >= pis.restock_threshold
-                        THEN 'revisar_compra' ELSE 'seguir_esperando' END AS recommendation
-            FROM product_interest_stats pis
-            INNER JOIN products p ON p.id = pis.product_id
-            ORDER BY total_interest DESC
-            LIMIT 50
-        `);
-        const [launchRows] = await db.execute('SELECT id, product_name, franchise, customer_email, requested_quantity, notes, status, created_at FROM launch_requests ORDER BY created_at DESC LIMIT 50');
-        const [researchRows] = await db.execute('SELECT id, customer_email, favorite_franchise, satisfaction_score, preferred_budget, play_style, trivia_answer, comments, created_at FROM customer_research ORDER BY created_at DESC LIMIT 50');
-        const [franchiseRows] = await db.execute('SELECT favorite_franchise, COUNT(*) AS responses, ROUND(AVG(satisfaction_score), 2) AS avg_satisfaction FROM customer_research GROUP BY favorite_franchise ORDER BY responses DESC');
-        const [styleRows] = await db.execute('SELECT play_style, COUNT(*) AS responses, ROUND(AVG(preferred_budget), 2) AS avg_budget FROM customer_research GROUP BY play_style ORDER BY responses DESC');
+        const restockRequestsCollection = db.collection('restock_requests');
+        const productInterestCollection = db.collection('product_interest_stats');
+        const launchRequestsCollection = db.collection('launch_requests');
+        const researchCollection = db.collection('customer_research');
+
+        const restockRows = await restockRequestsCollection.aggregate([
+            { $sort: { created_at: -1 } },
+            { $limit: 50 },
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: 'product_id',
+                    foreignField: '_id',
+                    as: 'product'
+                }
+            },
+            { $unwind: { path: '$product', preserveNullAndEmptyArrays: true } },
+            {
+                $project: {
+                    id: { $toString: '$_id' },
+                    product_id: { $toString: '$product_id' },
+                    product_name: '$product.name',
+                    customer_email: 1,
+                    requested_quantity: 1,
+                    season_key: 1,
+                    source: 1,
+                    status: 1,
+                    waiting_message: 1,
+                    threshold_snapshot: 1,
+                    interest_snapshot: 1,
+                    cancelled_at: 1,
+                    created_at: 1,
+                    updated_at: 1
+                }
+            }
+        ]).toArray();
+
+        const interestRows = await productInterestCollection.aggregate([
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: 'product_id',
+                    foreignField: '_id',
+                    as: 'product'
+                }
+            },
+            { $unwind: { path: '$product', preserveNullAndEmptyArrays: true } },
+            {
+                $project: {
+                    product_id: { $toString: '$product_id' },
+                    product_name: '$product.name',
+                    season_key: 1,
+                    product_views: 1,
+                    product_clicks: 1,
+                    whatsapp_messages: 1,
+                    restock_threshold: 1,
+                    total_interest: {
+                        $add: [{ $ifNull: ['$product_views', 0] }, { $ifNull: ['$product_clicks', 0] }, { $ifNull: ['$whatsapp_messages', 0] }]
+                    }
+                }
+            },
+            {
+                $addFields: {
+                    recommendation: {
+                        $cond: [
+                            { $gte: ['$total_interest', '$restock_threshold'] },
+                            'revisar_compra',
+                            'seguir_esperando'
+                        ]
+                    }
+                }
+            },
+            { $sort: { total_interest: -1 } },
+            { $limit: 50 }
+        ]).toArray();
+
+        const launchRows = await launchRequestsCollection.find().sort({ created_at: -1 }).limit(50).toArray();
+        const researchRows = await researchCollection.find().sort({ created_at: -1 }).limit(50).toArray();
+        const franchiseRows = await researchCollection.aggregate([
+            {
+                $group: {
+                    _id: '$favorite_franchise',
+                    responses: { $sum: 1 },
+                    avg_satisfaction: { $avg: '$satisfaction_score' }
+                }
+            },
+            {
+                $project: {
+                    favorite_franchise: '$_id',
+                    responses: 1,
+                    avg_satisfaction: { $round: ['$avg_satisfaction', 2] }
+                }
+            },
+            { $sort: { responses: -1 } }
+        ]).toArray();
+        const styleRows = await researchCollection.aggregate([
+            {
+                $group: {
+                    _id: '$play_style',
+                    responses: { $sum: 1 },
+                    avg_budget: { $avg: '$preferred_budget' }
+                }
+            },
+            {
+                $project: {
+                    play_style: '$_id',
+                    responses: 1,
+                    avg_budget: { $round: ['$avg_budget', 2] }
+                }
+            },
+            { $sort: { responses: -1 } }
+        ]).toArray();
 
         return res.status(200).json({
             success: true,
@@ -282,8 +422,27 @@ const getBusinessInsights = async (req, res) => {
                 seasonEndsAt: getSeasonEndDate(),
                 restockRequests: restockRows,
                 productInterest: interestRows,
-                launchRequests: launchRows,
-                researchResponses: researchRows,
+                launchRequests: launchRows.map((item) => ({
+                    id: item._id?.toString(),
+                    product_name: item.product_name,
+                    franchise: item.franchise,
+                    customer_email: item.customer_email,
+                    requested_quantity: item.requested_quantity,
+                    notes: item.notes,
+                    status: item.status,
+                    created_at: item.created_at?.toISOString()
+                })),
+                researchResponses: researchRows.map((item) => ({
+                    id: item._id?.toString(),
+                    customer_email: item.customer_email,
+                    favorite_franchise: item.favorite_franchise,
+                    satisfaction_score: item.satisfaction_score,
+                    preferred_budget: item.preferred_budget,
+                    play_style: item.play_style,
+                    trivia_answer: item.trivia_answer,
+                    comments: item.comments,
+                    created_at: item.created_at?.toISOString()
+                })),
                 franchiseSummary: franchiseRows,
                 playStyleSummary: styleRows
             }

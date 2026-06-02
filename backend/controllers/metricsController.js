@@ -7,12 +7,13 @@ const trackClickEvent = async (req, res) => {
     }
 
     try {
-        const [result] = await db.execute(
-            'UPDATE click_analytics SET accumulated_clicks = accumulated_clicks + 1 WHERE element_identifier = ?',
-            [elementId]
+        const analytics = db.collection('click_analytics');
+        const result = await analytics.updateOne(
+            { element_identifier: elementId },
+            { $inc: { accumulated_clicks: 1 }, $set: { last_triggered: new Date() } }
         );
 
-        if (result.affectedRows === 0) {
+        if (result.matchedCount === 0) {
             return res.status(404).json({ success: false, message: 'Elemento no registrado en el inventario de métricas.' });
         }
 
@@ -25,9 +26,8 @@ const trackClickEvent = async (req, res) => {
 
 const getDashboardMetrics = async (req, res) => {
     try {
-        const [rows] = await db.execute(
-            'SELECT element_identifier, element_description, accumulated_clicks, last_triggered FROM click_analytics ORDER BY accumulated_clicks DESC'
-        );
+        const analytics = db.collection('click_analytics');
+        const rows = await analytics.find().sort({ accumulated_clicks: -1 }).toArray();
         const totalClicks = rows.reduce((sum, row) => sum + Number(row.accumulated_clicks || 0), 0);
         const keyClicks = rows
             .filter((row) => ['btn_agregar_carrito', 'imagen_producto_detalle'].includes(row.element_identifier))

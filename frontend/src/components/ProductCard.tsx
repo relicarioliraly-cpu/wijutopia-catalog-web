@@ -7,7 +7,7 @@ import { Product } from '@/lib/api';
 import { useTracker } from '@/hooks/useTracker';
 
 type ActiveRestock = {
-  id: number;
+  id: string;
   customerEmail: string;
   status: string;
 };
@@ -35,7 +35,7 @@ export default function ProductCard({
   const imageUrl = product.image_url || 'https://picsum.photos/500/700';
   const isAvailable = product.stock > 0;
   const isLaunch = product.release_status === 'lanzamiento';
-  const viewedProductId = useRef<number | null>(null);
+  const viewedProductId = useRef<string | null>(null);
 
   useEffect(() => {
     if (viewedProductId.current !== product.id) {

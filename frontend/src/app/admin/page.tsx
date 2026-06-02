@@ -82,7 +82,7 @@ export default function AdminPage() {
     }
   };
 
-  const deleteProduct = async (id: number) => {
+  const deleteProduct = async (id: string) => {
     if (!window.confirm('¿Seguro que deseas eliminar este producto de la base de datos de Wijutopia?')) return;
     try {
       await apiFetch(`/api/products/${id}`, { method: 'DELETE', headers: authHeaders });
@@ -222,7 +222,7 @@ export default function AdminPage() {
               </label>
             </div>
             <button type="submit" className="w-full rounded-2xl bg-wiju-crimson py-4 font-black text-white hover:bg-opacity-90 dark:bg-wiju-gold dark:text-black">
-              Registrar en MySQL
+              Registrar producto
             </button>
           </form>
 

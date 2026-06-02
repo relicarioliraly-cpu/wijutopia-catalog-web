@@ -7,6 +7,7 @@ const authRoutes = require('./routes/authRoutes');
 const metricsRoutes = require('./routes/metricsRoutes');
 const insightsRoutes = require('./routes/insightsRoutes');
 const productRoutes = require('./routes/productRoutes');
+const db = require('./config/db');
 
 dotenv.config();
 
@@ -37,9 +38,16 @@ app.use((error, req, res, next) => {
 });
 
 if (require.main === module) {
-    app.listen(port, () => {
-        console.log(`API Wijutopia escuchando en http://localhost:${port}`);
-    });
+    db.connect()
+        .then(() => {
+            app.listen(port, () => {
+                console.log(`API Wijutopia escuchando en http://localhost:${port}`);
+            });
+        })
+        .catch((error) => {
+            console.error('No se pudo conectar a MongoDB Atlas:', error.message);
+            process.exit(1);
+        });
 }
 
 module.exports = app;

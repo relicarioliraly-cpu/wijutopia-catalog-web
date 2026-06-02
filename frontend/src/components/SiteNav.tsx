@@ -15,8 +15,8 @@ export default function SiteNav() {
   return (
     <header className="sticky top-0 z-40 border-b-2 border-wiju-moonGold/70 bg-wiju-logoWine px-4 py-3 text-white shadow-neon dark:border-wiju-moonGold dark:bg-wiju-logoWineDark">
       <nav className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3">
-        <a href="/" data-sound="nav" className="inline-flex items-center gap-3 rounded-2xl bg-white px-3 py-2 text-wiju-logoWine shadow-card transition hover:-translate-y-0.5">
-          <img src="/wijutopia-logo.svg" alt="Logo Wijutopia Card Game Store" className="h-12 w-12 rounded-full" />
+        <a href="/" data-sound="nav" className="inline-flex items-center gap-3 rounded-2xl bg-white px-3 py-2 text-wiju-logoWine shadow-card transition hover:-translate-y-0.5" aria-label="Ir al inicio de Wijutopia">
+          <img src="/wijutopia-logo.svg" alt="Logo Wijutopia Card Game Store" className="h-14 w-14 rounded-full bg-white/95 p-1 shadow-neon" />
           <span className="hidden text-lg font-black tracking-tight sm:inline">Wijutopia</span>
         </a>
 

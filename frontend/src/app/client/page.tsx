@@ -6,12 +6,12 @@ import { apiFetch, Product } from '@/lib/api';
 import { useTracker } from '@/hooks/useTracker';
 
 type CartItem = Product & { quantity: number };
-type ActiveRestock = { id: number; customerEmail: string; status: string };
+type ActiveRestock = { id: string; customerEmail: string; status: string };
 
 export default function ClientPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [activeRestocks, setActiveRestocks] = useState<Record<number, ActiveRestock>>({});
+  const [activeRestocks, setActiveRestocks] = useState<Record<string, ActiveRestock>>({});
   const [query, setQuery] = useState('');
   const [message, setMessage] = useState('');
   const { trackClick } = useTracker();
@@ -78,7 +78,7 @@ export default function ClientPage() {
     }
 
     try {
-      const payload = await apiFetch<{ success: boolean; message: string; data: { id: number; status: string; seasonKey: string; seasonEndsAt: string; totalInterest: number; threshold: number } }>(`/api/insights/products/${product.id}/restock`, {
+      const payload = await apiFetch<{ success: boolean; message: string; data: { id: string; status: string; seasonKey: string; seasonEndsAt: string; totalInterest: number; threshold: number } }>(`/api/insights/products/${product.id}/restock`, {
         method: 'POST',
         body: JSON.stringify({ customerEmail, requestedQuantity: 1 })
       });
@@ -200,7 +200,7 @@ export default function ClientPage() {
             onChange={(event) => setQuery(event.target.value)}
             onFocus={() => void trackClick('enlace_navbar_catalogo')}
             placeholder="Filtrar por Pokémon, One Piece, booster, accesorio..."
-            className="focus-ring w-full rounded-2xl border border-wiju-borderLight bg-white px-5 py-4 dark:border-wiju-borderDark dark:bg-wiju-cardDark"
+            className="focus-ring w-full rounded-2xl border border-wiju-borderLight bg-white px-5 py-4 text-slate-900 placeholder:text-slate-500 transition dark:border-wiju-borderDark dark:bg-slate-950 dark:text-white"
           />
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             {filteredProducts.map((product) => (
@@ -244,12 +244,12 @@ export default function ClientPage() {
             <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">Solicita productos que todavía no aparecen en catálogo para que el panel administrativo los evalúe por temporada.</p>
           </div>
           <div className="grid gap-4">
-            <input name="productName" placeholder="Nombre del producto esperado" className="rounded-xl border border-slate-300 dark:border-slate-700 p-4 text-black focus:outline-none focus:ring-2 focus:ring-wiju-crimson" required />
-            <input name="franchise" placeholder="Franquicia: Pokémon, One Piece, Digimon..." className="rounded-xl border border-slate-300 dark:border-slate-700 p-4 text-black focus:outline-none focus:ring-2 focus:ring-wiju-crimson" required />
-            <input name="customerEmail" type="email" placeholder="Correo opcional" className="rounded-xl border border-slate-300 dark:border-slate-700 p-4 text-black focus:outline-none focus:ring-2 focus:ring-wiju-crimson" />
-            <input name="requestedQuantity" type="number" min="1" defaultValue="1" className="rounded-xl border border-slate-300 dark:border-slate-700 p-4 text-black focus:outline-none focus:ring-2 focus:ring-wiju-crimson" />
-            <textarea name="notes" placeholder="Notas: idioma, rareza, fecha de salida, presupuesto..." className="rounded-xl border border-slate-300 dark:border-slate-700 p-4 text-black focus:outline-none focus:ring-2 focus:ring-wiju-crimson min-h-[110px]" />
-            <button type="submit" className="rounded-2xl bg-wiju-signMagenta px-5 py-4 font-black text-white shadow-neon hover:bg-opacity-90 transition-all dark:bg-wiju-moonGold dark:text-wiju-ink">Enviar pedido</button>
+            <input name="productName" placeholder="Nombre del producto esperado" className="w-full rounded-xl border border-slate-300 bg-white px-4 py-4 text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-wiju-crimson dark:border-slate-700 dark:bg-slate-950 dark:text-white" required />
+            <input name="franchise" placeholder="Franquicia: Pokémon, One Piece, Digimon..." className="w-full rounded-xl border border-slate-300 bg-white px-4 py-4 text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-wiju-crimson dark:border-slate-700 dark:bg-slate-950 dark:text-white" required />
+            <input name="customerEmail" type="email" placeholder="Correo opcional" className="w-full rounded-xl border border-slate-300 bg-white px-4 py-4 text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-wiju-crimson dark:border-slate-700 dark:bg-slate-950 dark:text-white" />
+            <input name="requestedQuantity" type="number" min="1" defaultValue="1" className="w-full rounded-xl border border-slate-300 bg-white px-4 py-4 text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-wiju-crimson dark:border-slate-700 dark:bg-slate-950 dark:text-white" />
+            <textarea name="notes" placeholder="Notas: idioma, rareza, fecha de salida, presupuesto..." className="w-full rounded-xl border border-slate-300 bg-white px-4 py-4 text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-wiju-crimson min-h-[110px] dark:border-slate-700 dark:bg-slate-950 dark:text-white" />
+            <button type="submit" className="w-full rounded-2xl bg-wiju-signMagenta px-5 py-4 font-black text-white shadow-neon hover:bg-opacity-90 transition-all dark:bg-wiju-moonGold dark:text-wiju-ink">Enviar pedido</button>
           </div>
         </form>
 
@@ -264,10 +264,10 @@ export default function ClientPage() {
                 <legend className="rounded-full bg-wiju-logoWine px-4 py-1.5 text-xs font-black text-white">1. Encuesta</legend>
                 <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">Preferencias de compra</p>
                 <div className="grid gap-3">
-                  <input name="customerEmail" type="email" placeholder="Correo opcional" className="rounded-xl border border-slate-300 p-3.5 text-black focus:outline-none focus:ring-2 focus:ring-wiju-crimson" />
-                  <input name="favoriteFranchise" placeholder="Franquicia favorita" className="rounded-xl border border-slate-300 p-3.5 text-black focus:outline-none focus:ring-2 focus:ring-wiju-crimson" required />
-                  <input name="preferredBudget" type="number" min="0" step="0.01" placeholder="Presupuesto mensual" className="rounded-xl border border-slate-300 p-3.5 text-black focus:outline-none focus:ring-2 focus:ring-wiju-crimson" />
-                  <select name="playStyle" className="rounded-xl border border-slate-300 p-3.5 text-black focus:outline-none focus:ring-2 focus:ring-wiju-crimson">
+                  <input name="customerEmail" type="email" placeholder="Correo opcional" className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-3 text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-wiju-crimson dark:border-slate-700 dark:bg-slate-950 dark:text-white" />
+                  <input name="favoriteFranchise" placeholder="Franquicia favorita" className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-3 text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-wiju-crimson dark:border-slate-700 dark:bg-slate-950 dark:text-white" required />
+                  <input name="preferredBudget" type="number" min="0" step="0.01" placeholder="Presupuesto mensual" className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-3 text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-wiju-crimson dark:border-slate-700 dark:bg-slate-950 dark:text-white" />
+                  <select name="playStyle" className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-wiju-crimson dark:border-slate-700 dark:bg-slate-950 dark:text-white">
                     <option value="competitivo">Competitivo</option>
                     <option value="coleccionista">Coleccionista</option>
                     <option value="casual">Casual</option>
@@ -280,8 +280,8 @@ export default function ClientPage() {
                 <legend className="rounded-full bg-wiju-moonGold px-4 py-1.5 text-xs font-black text-wiju-ink">2. Trivia</legend>
                 <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">Eventos y comunidad</p>
                 <div className="grid gap-3">
-                  <input name="triviaAnswer" placeholder="¿Qué formato te interesa?" className="rounded-xl border border-slate-300 p-3.5 text-black focus:outline-none focus:ring-2 focus:ring-wiju-crimson" />
-                  <textarea name="comments" placeholder="¿Qué productos traer?" className="min-h-[120px] rounded-xl border border-slate-300 p-3.5 text-black focus:outline-none focus:ring-2 focus:ring-wiju-crimson" />
+                  <input name="triviaAnswer" placeholder="¿Qué formato te interesa?" className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-3 text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-wiju-crimson dark:border-slate-700 dark:bg-slate-950 dark:text-white" />
+                  <textarea name="comments" placeholder="¿Qué productos traer?" className="w-full min-h-[120px] rounded-xl border border-slate-300 bg-white px-3.5 py-3 text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-wiju-crimson dark:border-slate-700 dark:bg-slate-950 dark:text-white" />
                 </div>
               </fieldset>
 
@@ -289,7 +289,7 @@ export default function ClientPage() {
                 <legend className="rounded-full bg-wiju-logoWine px-4 py-1.5 text-xs font-black text-white">3. Satisfacción</legend>
                 <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">Experiencia catálogo</p>
                 <div className="grid gap-3">
-                  <select name="satisfactionScore" className="rounded-xl border border-slate-300 p-3.5 text-black focus:outline-none focus:ring-2 focus:ring-wiju-crimson" required>
+                  <select name="satisfactionScore" className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-wiju-crimson dark:border-slate-700 dark:bg-slate-950 dark:text-white" required>
                     <option value="5">5 - Muy satisfecho</option>
                     <option value="4">4 - Satisfecho</option>
                     <option value="3">3 - Neutral</option>

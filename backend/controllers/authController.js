@@ -10,15 +10,19 @@ const signToken = (user) => jwt.sign(
 );
 
 const ensureAdminUser = async () => {
-    const adminEmail = process.env.ADMIN_EMAIL || 'admin@wijutopia.com';
+    const adminEmail = (process.env.ADMIN_EMAIL || 'admin@wijutopia.com').toLowerCase();
     const adminPassword = process.env.ADMIN_PASSWORD || 'WijuAdmin2026_TrujilloTcg!';
-    const [rows] = await db.execute('SELECT id FROM users WHERE email = ?', [adminEmail]);
-    if (!rows.length) {
+    const users = db.collection('users');
+    const existing = await users.findOne({ email: adminEmail });
+    if (!existing) {
         const passwordHash = await bcrypt.hash(adminPassword, 12);
-        await db.execute(
-            'INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)',
-            ['Administrador Wijutopia', adminEmail, passwordHash, 'empleado']
-        );
+        await users.insertOne({
+            name: 'Administrador Wijutopia',
+            email: adminEmail,
+            password_hash: passwordHash,
+            role: 'empleado',
+            created_at: new Date()
+        });
     }
 };
 
@@ -32,15 +36,20 @@ const register = async (req, res) => {
     }
 
     try {
+        const users = db.collection('users');
+        const normalizedEmail = String(email).trim().toLowerCase();
         const passwordHash = await bcrypt.hash(password, 12);
-        const [result] = await db.execute(
-            'INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)',
-            [name, email, passwordHash, 'cliente']
-        );
-        const user = { id: result.insertId, name, email, role: 'cliente' };
+        const result = await users.insertOne({
+            name,
+            email: normalizedEmail,
+            password_hash: passwordHash,
+            role: 'cliente',
+            created_at: new Date()
+        });
+        const user = { id: result.insertedId.toString(), name, email: normalizedEmail, role: 'cliente' };
         return res.status(201).json({ success: true, token: signToken(user), user });
     } catch (error) {
-        if (error.code === 'ER_DUP_ENTRY') {
+        if (error.code === 11000) {
             return res.status(409).json({ success: false, message: 'El correo ya está registrado.' });
         }
         console.error('Error al registrar usuario:', error.message);
@@ -56,16 +65,17 @@ const login = async (req, res) => {
 
     try {
         await ensureAdminUser();
-        const [rows] = await db.execute('SELECT id, name, email, password_hash, role FROM users WHERE email = ?', [email]);
-        if (!rows.length) {
+        const users = db.collection('users');
+        const normalizedEmail = String(email).trim().toLowerCase();
+        const user = await users.findOne({ email: normalizedEmail });
+        if (!user) {
             return res.status(401).json({ success: false, message: 'Credenciales inválidas.' });
         }
-        const user = rows[0];
         const isValid = await bcrypt.compare(password, user.password_hash);
         if (!isValid) {
             return res.status(401).json({ success: false, message: 'Credenciales inválidas.' });
         }
-        const safeUser = { id: user.id, name: user.name, email: user.email, role: user.role };
+        const safeUser = { id: user._id.toString(), name: user.name, email: user.email, role: user.role };
         return res.status(200).json({ success: true, token: signToken(safeUser), user: safeUser });
     } catch (error) {
         console.error('Error al iniciar sesión:', error.message);

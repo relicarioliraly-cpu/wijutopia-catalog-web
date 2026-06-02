@@ -11,7 +11,7 @@ export default function HomePage() {
     <main className="mx-auto max-w-7xl space-y-10 px-4 py-10">
       <section className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
         <div className="space-y-7">
-          <p className="inline-flex items-center gap-2 rounded-full border border-wiju-moonGold/50 px-4 py-2 text-sm font-bold text-wiju-signMagenta dark:text-wiju-moonGold"><SparkIcon className="h-4 w-4" /> Next.js + Express.js + MySQL</p>
+          <p className="inline-flex items-center gap-2 rounded-full border border-wiju-moonGold/50 px-4 py-2 text-sm font-bold text-wiju-signMagenta dark:text-wiju-moonGold"><SparkIcon className="h-4 w-4" /> Next.js + Express.js + MongoDB Atlas</p>
           <div className="flex items-center gap-4">
             <img src="/wijutopia-logo.svg" alt="Logo Wijutopia Card Game Store" className="h-24 w-24 rounded-full bg-white p-1 shadow-neon" />
             <h1 className="text-4xl font-black leading-tight md:text-7xl">Wijutopia TCG visual, claro y conectado.</h1>
