@@ -25,6 +25,23 @@ El repositorio incluye dos archivos `railpack.toml` para evitar que Railway lea 
 - El script `frontend` de producción usa `next start -p ${PORT:-3000}` para respetar el puerto dinámico que inyecta Railway.
 - Para backend en Railway, configure un servicio separado con `rootDirectory = "backend"` y las variables de entorno de MongoDB/JWT/CAPTCHA.
 - Si está migrando de un proyecto con MySQL, elimine todas las variables `MYSQL_*` de Railway y use únicamente `MONGODB_URI` y `MONGODB_DB`.
+- No use variables como `MYSQL_DATABASE`, `MYSQL_URL`, `MYSQLHOST`, `MYSQLPASSWORD`, `MYSQLPORT`, `MYSQLUSER`, ni `MYSQL_PUBLIC_URL`.
+- No monte volúmenes en `/var/lib/mysql` ni en `/var/lib/Mongodb` para este servicio de aplicación Node.js.
+- No establezca un `Start Command` de MySQL (`docker-entrypoint.sh mysqld ...`) en el servicio que despliega la app.
+
+### Cómo corregir un servicio Railway mal configurado como MySQL
+
+Si Railway muestra un comando de inicio `docker-entrypoint.sh mysqld ...` o intenta arrancar MySQL, tu servicio está configurado con la plantilla equivocada. Para desplegar esta app debes:
+
+1. Abrir el servicio en Railway y verificar que no sea una base de datos MySQL.
+2. Eliminar cualquier `Start Command` que contenga `mysqld` o `mysql`.
+3. Eliminar todas las variables `MYSQL_*` de ese servicio.
+4. No montar ningún volumen en `/var/lib/mysql` ni en `/var/lib/Mongodb`.
+5. Configurar el servicio como Node.js con `rootDirectory = "backend"` (o crear un nuevo servicio apuntando a `backend`).
+6. Establecer el `Start Command` para la app backend en `npm start`.
+7. Usar únicamente `MONGODB_URI` y `MONGODB_DB` para la conexión de datos.
+
+Si necesitas usar MongoDB en Railway, crea un servicio MongoDB independiente y copia su URI a `MONGODB_URI`.
 
 ### Variables de entorno recomendadas para Railway
 
