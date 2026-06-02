@@ -13,6 +13,12 @@ export default function ClientPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [activeRestocks, setActiveRestocks] = useState<Record<string, ActiveRestock>>({});
   const [query, setQuery] = useState('');
+  const [availability, setAvailability] = useState<'all' | 'available' | 'soldout'>('all');
+  const [productTagFilter, setProductTagFilter] = useState('all');
+  const [releaseStatus, setReleaseStatus] = useState<'all' | 'catalogo' | 'lanzamiento'>('all');
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
+  const [sortBy, setSortBy] = useState<'newest' | 'priceAsc' | 'priceDesc'>('newest');
   const [message, setMessage] = useState('');
   const { trackClick } = useTracker();
 
@@ -42,9 +48,36 @@ export default function ClientPage() {
 
 
   const filteredProducts = useMemo(() => {
-    const normalizedQuery = query.toLowerCase();
-    return products.filter((product) => product.name.toLowerCase().includes(normalizedQuery));
-  }, [products, query]);
+    const normalizedQuery = query.toLowerCase().trim();
+    const numericQuery = Number(normalizedQuery);
+    const hasPriceFilter = minPrice !== '' || maxPrice !== '';
+    return products
+      .filter((product) => {
+        const availabilityText = product.stock > 0 ? 'disponible' : 'agotado restock';
+        const haystack = `${product.name} ${product.description || ''} ${product.category || ''} ${product.product_tag || ''} ${product.release_status || ''} ${availabilityText}`.toLowerCase();
+        const matchesQuery = !normalizedQuery || haystack.includes(normalizedQuery) ||
+          (!Number.isNaN(numericQuery) && (Number(product.price) === numericQuery || product.stock === numericQuery));
+
+        const matchesAvailability = availability === 'all'
+          || (availability === 'available' && product.stock > 0)
+          || (availability === 'soldout' && product.stock === 0);
+
+        const matchesProductTag = productTagFilter === 'all' || product.product_tag === productTagFilter;
+        const matchesReleaseStatus = releaseStatus === 'all' || product.release_status === releaseStatus;
+
+        const priceValue = Number(product.price || 0);
+        const matchesPrice = (!hasPriceFilter)
+          || (minPrice === '' || priceValue >= Number(minPrice))
+          || (maxPrice === '' || priceValue <= Number(maxPrice));
+
+        return matchesQuery && matchesAvailability && matchesProductTag && matchesReleaseStatus && matchesPrice;
+      })
+      .sort((a, b) => {
+        if (sortBy === 'priceAsc') return a.price - b.price;
+        if (sortBy === 'priceDesc') return b.price - a.price;
+        return new Date(b.created_at || '').getTime() - new Date(a.created_at || '').getTime();
+      });
+  }, [products, query, availability, productTagFilter, releaseStatus, minPrice, maxPrice, sortBy]);
 
   const cartTotal = cart.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0);
 
@@ -195,27 +228,76 @@ export default function ClientPage() {
 
       <section className="grid gap-8 lg:grid-cols-[1fr_360px]">
         <div className="space-y-6">
+          <div className="space-y-4">
+        <div className="grid gap-4 xl:grid-cols-[1fr_auto]">
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             onFocus={() => void trackClick('enlace_navbar_catalogo')}
-            placeholder="Filtrar por Pokémon, One Piece, booster, accesorio..."
+            placeholder="Buscar por carta, set, rareza, categoría, producto o precio..."
             className="focus-ring w-full rounded-2xl border border-wiju-borderLight bg-white px-5 py-4 text-slate-900 placeholder:text-slate-500 transition dark:border-wiju-borderDark dark:bg-slate-950 dark:text-white"
           />
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {filteredProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                activeRestock={activeRestocks[product.id]}
-                onAddToCart={addToCart}
-                onRestockRequest={requestRestock}
-                onCancelRestock={cancelRestock}
-                onPreorderRequest={requestPreorderForProduct}
-                onInterestEvent={trackProductInterest}
-              />
-            ))}
-          </div>
+          <p className="rounded-2xl bg-wiju-signMagenta px-5 py-4 text-center font-black text-white shadow-neon dark:bg-wiju-moonGold dark:text-wiju-ink">{filteredProducts.length} resultados</p>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-[1fr_1fr_1fr_1fr]">
+          <select value={availability} onChange={(event) => setAvailability(event.target.value as any)} className="rounded-2xl border border-wiju-borderLight bg-white px-4 py-4 text-slate-900 focus:outline-none focus:ring-2 focus:ring-wiju-crimson dark:border-wiju-borderDark dark:bg-slate-950 dark:text-white">
+            <option value="all">Todos los estados</option>
+            <option value="available">Solo disponibles</option>
+            <option value="soldout">Solo agotados</option>
+          </select>
+          <select value={productTagFilter} onChange={(event) => setProductTagFilter(event.target.value)} className="rounded-2xl border border-wiju-borderLight bg-white px-4 py-4 text-slate-900 focus:outline-none focus:ring-2 focus:ring-wiju-crimson dark:border-wiju-borderDark dark:bg-slate-950 dark:text-white">
+            <option value="all">Todas las etiquetas</option>
+            <option value="En vitrina">En vitrina</option>
+            <option value="Pedido por encargo">Pedido por encargo</option>
+            <option value="Restock prioritario">Restock prioritario</option>
+            <option value="Preventa Wijutopia">Preventa Wijutopia</option>
+            <option value="Torneo/Liga">Torneo/Liga</option>
+            <option value="Accesorio TCG">Accesorio TCG</option>
+          </select>
+          <select value={releaseStatus} onChange={(event) => setReleaseStatus(event.target.value as any)} className="rounded-2xl border border-wiju-borderLight bg-white px-4 py-4 text-slate-900 focus:outline-none focus:ring-2 focus:ring-wiju-crimson dark:border-wiju-borderDark dark:bg-slate-950 dark:text-white">
+            <option value="all">Todas las ramas</option>
+            <option value="catalogo">Catálogo</option>
+            <option value="lanzamiento">Lanzamiento</option>
+          </select>
+          <select value={sortBy} onChange={(event) => setSortBy(event.target.value as any)} className="rounded-2xl border border-wiju-borderLight bg-white px-4 py-4 text-slate-900 focus:outline-none focus:ring-2 focus:ring-wiju-crimson dark:border-wiju-borderDark dark:bg-slate-950 dark:text-white">
+            <option value="newest">Más recientes</option>
+            <option value="priceAsc">Precio ascendente</option>
+            <option value="priceDesc">Precio descendente</option>
+          </select>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <input
+            value={minPrice}
+            onChange={(event) => setMinPrice(event.target.value.replace(/[^0-9.]/g, ''))}
+            placeholder="Precio mínimo"
+            className="rounded-2xl border border-wiju-borderLight bg-white px-5 py-4 text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-wiju-crimson dark:border-wiju-borderDark dark:bg-slate-950 dark:text-white"
+          />
+          <input
+            value={maxPrice}
+            onChange={(event) => setMaxPrice(event.target.value.replace(/[^0-9.]/g, ''))}
+            placeholder="Precio máximo"
+            className="rounded-2xl border border-wiju-borderLight bg-white px-5 py-4 text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-wiju-crimson dark:border-wiju-borderDark dark:bg-slate-950 dark:text-white"
+          />
+          <button type="button" onClick={() => { setMinPrice(''); setMaxPrice(''); setAvailability('all'); setProductTagFilter('all'); setReleaseStatus('all'); setSortBy('newest'); }} className="rounded-2xl border border-wiju-borderLight bg-transparent px-5 py-4 text-slate-900 transition hover:bg-wiju-signMagenta/10 dark:border-wiju-borderDark dark:text-white">Limpiar filtros</button>
+        </div>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        {filteredProducts.map((product) => (
+          <ProductCard
+            key={product.id}
+            product={product}
+            activeRestock={activeRestocks[product.id]}
+            onAddToCart={addToCart}
+            onRestockRequest={requestRestock}
+            onCancelRestock={cancelRestock}
+            onPreorderRequest={requestPreorderForProduct}
+            onInterestEvent={trackProductInterest}
+          />
+        ))}
+      </div>
         </div>
 
         <aside className="space-y-6">
@@ -254,19 +336,19 @@ export default function ClientPage() {
         </form>
 
         <section className="rounded-3xl border border-wiju-moonGold/50 bg-white p-8 shadow-neon dark:bg-wiju-doorPurple/60">
-          <p className="text-xs font-black uppercase tracking-[0.25em] text-wiju-signMagenta dark:text-wiju-moonGold">Tu opinión</p>
-          <h2 className="mt-2 text-3xl font-black">Ayúdanos a entender tu conducta como cliente</h2>
-          <p className="mt-2 text-sm text-slate-600 dark:text-slate-200">Separé esta zona en encuesta, trivia y satisfacción para que cada respuesta tenga un propósito claro dentro del informe administrativo.</p>
+          <p className="text-xs font-black uppercase tracking-[0.25em] text-wiju-signMagenta dark:text-wiju-moonGold">Sugerencias de catálogo</p>
+          <h2 className="mt-2 text-3xl font-black">Danos señales para mejorar la selección</h2>
+          <p className="mt-2 text-sm text-slate-600 dark:text-slate-200">Registra preferencias, presupuesto y formatos que te interesan. Estos datos alimentan la base del catálogo y ayudan al motor interno a priorizar productos sin llamarlo encuesta.</p>
 
           <form onSubmit={handleResearchSubmit} className="mt-8 space-y-8">
             <div className="grid gap-6 xl:grid-cols-3">
               <fieldset className="rounded-3xl border border-wiju-logoWine/20 bg-wiju-logoWine/5 p-6 dark:border-white/15 dark:bg-black/20 space-y-4">
-                <legend className="rounded-full bg-wiju-logoWine px-4 py-1.5 text-xs font-black text-white">1. Encuesta</legend>
-                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">Preferencias de compra</p>
+                <legend className="rounded-full bg-wiju-logoWine px-4 py-1.5 text-xs font-black text-white">Preferencias</legend>
+                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">Géneros y presupuesto</p>
                 <div className="grid gap-3">
                   <input name="customerEmail" type="email" placeholder="Correo opcional" className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-3 text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-wiju-crimson dark:border-slate-700 dark:bg-slate-950 dark:text-white" />
-                  <input name="favoriteFranchise" placeholder="Franquicia favorita" className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-3 text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-wiju-crimson dark:border-slate-700 dark:bg-slate-950 dark:text-white" required />
-                  <input name="preferredBudget" type="number" min="0" step="0.01" placeholder="Presupuesto mensual" className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-3 text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-wiju-crimson dark:border-slate-700 dark:bg-slate-950 dark:text-white" />
+                  <input name="favoriteFranchise" placeholder="Franquicia preferida" className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-3 text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-wiju-crimson dark:border-slate-700 dark:bg-slate-950 dark:text-white" required />
+                  <input name="preferredBudget" type="number" min="0" step="0.01" placeholder="Presupuesto aproximado" className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-3 text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-wiju-crimson dark:border-slate-700 dark:bg-slate-950 dark:text-white" />
                   <select name="playStyle" className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-wiju-crimson dark:border-slate-700 dark:bg-slate-950 dark:text-white">
                     <option value="competitivo">Competitivo</option>
                     <option value="coleccionista">Coleccionista</option>
@@ -277,31 +359,31 @@ export default function ClientPage() {
               </fieldset>
 
               <fieldset className="rounded-3xl border border-wiju-logoWine/20 bg-wiju-logoWine/5 p-6 dark:border-white/15 dark:bg-black/20 space-y-4">
-                <legend className="rounded-full bg-wiju-moonGold px-4 py-1.5 text-xs font-black text-wiju-ink">2. Trivia</legend>
-                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">Eventos y comunidad</p>
+                <legend className="rounded-full bg-wiju-moonGold px-4 py-1.5 text-xs font-black text-wiju-ink">Formatos</legend>
+                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">Interés por lanzamientos y packs</p>
                 <div className="grid gap-3">
-                  <input name="triviaAnswer" placeholder="¿Qué formato te interesa?" className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-3 text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-wiju-crimson dark:border-slate-700 dark:bg-slate-950 dark:text-white" />
-                  <textarea name="comments" placeholder="¿Qué productos traer?" className="w-full min-h-[120px] rounded-xl border border-slate-300 bg-white px-3.5 py-3 text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-wiju-crimson dark:border-slate-700 dark:bg-slate-950 dark:text-white" />
+                  <input name="triviaAnswer" placeholder="¿Qué tipo de producto buscas?" className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-3 text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-wiju-crimson dark:border-slate-700 dark:bg-slate-950 dark:text-white" />
+                  <textarea name="comments" placeholder="Describe qué debes encontrar aquí" className="w-full min-h-[120px] rounded-xl border border-slate-300 bg-white px-3.5 py-3 text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-wiju-crimson dark:border-slate-700 dark:bg-slate-950 dark:text-white" />
                 </div>
               </fieldset>
 
               <fieldset className="rounded-3xl border border-wiju-logoWine/20 bg-wiju-logoWine/5 p-6 dark:border-white/15 dark:bg-black/20 space-y-4">
-                <legend className="rounded-full bg-wiju-logoWine px-4 py-1.5 text-xs font-black text-white">3. Satisfacción</legend>
-                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">Experiencia catálogo</p>
+                <legend className="rounded-full bg-wiju-logoWine px-4 py-1.5 text-xs font-black text-white">Experiencia</legend>
+                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">Cómo usar el catálogo</p>
                 <div className="grid gap-3">
                   <select name="satisfactionScore" className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-wiju-crimson dark:border-slate-700 dark:bg-slate-950 dark:text-white" required>
-                    <option value="5">5 - Muy satisfecho</option>
-                    <option value="4">4 - Satisfecho</option>
-                    <option value="3">3 - Neutral</option>
-                    <option value="2">2 - Insatisfecho</option>
-                    <option value="1">1 - Muy insatisfecho</option>
+                    <option value="5">5 - Muy útil</option>
+                    <option value="4">4 - Útil</option>
+                    <option value="3">3 - Regular</option>
+                    <option value="2">2 - Confuso</option>
+                    <option value="1">1 - No ayudó</option>
                   </select>
-                  <p className="rounded-2xl bg-wiju-moonGold/15 p-4 text-xs font-medium text-slate-700 dark:text-slate-100 leading-relaxed">Tu respuesta se guarda como investigación para decidir stock local.</p>
+                  <p className="rounded-2xl bg-wiju-moonGold/15 p-4 text-xs font-medium text-slate-700 dark:text-slate-100 leading-relaxed">Tus señales se guardan como datos de catalogación y prioridad.</p>
                 </div>
               </fieldset>
             </div>
 
-            <button type="submit" className="w-full rounded-2xl bg-wiju-moonGold px-5 py-4 font-black text-wiju-ink shadow-neon hover:bg-opacity-90 transition-all">Guardar mi opinión</button>
+            <button type="submit" className="w-full rounded-2xl bg-wiju-moonGold px-5 py-4 font-black text-wiju-ink shadow-neon hover:bg-opacity-90 transition-all">Enviar sugerencia</button>
           </form>
         </section>
       </section>

@@ -24,6 +24,27 @@ El repositorio incluye dos archivos `railpack.toml` para evitar que Railway lea 
 - Si el servicio queda apuntando a la raíz del repositorio, `railpack.toml` fuerza la instalación, compilación y arranque desde `frontend/`.
 - El script `frontend` de producción usa `next start -p ${PORT:-3000}` para respetar el puerto dinámico que inyecta Railway.
 - Para backend en Railway, configure un servicio separado con `rootDirectory = "backend"` y las variables de entorno de MongoDB/JWT/CAPTCHA.
+- Si está migrando de un proyecto con MySQL, elimine todas las variables `MYSQL_*` de Railway y use únicamente `MONGODB_URI` y `MONGODB_DB`.
+
+### Variables de entorno recomendadas para Railway
+
+Configure estas variables en el servicio backend de Railway:
+
+```env
+PORT=5000
+MONGODB_URI=mongodb+srv://<usuario>:<contraseña>@cluster0.mongodb.net
+MONGODB_DB=wijutopia_db
+JWT_SECRET=secret_de_produccion_o_seed_seguro
+CAPTCHA_KEY=<clave_hex>
+CAPTCHA_IV=<vector-inicializacion_hex>
+ADMIN_EMAIL=admin@wijutopia.com
+ADMIN_PASSWORD=WijuAdmin2026_TrujilloTcg!
+FRONTEND_ORIGIN=https://<tu-dominio-frontend>
+```
+
+- `MONGODB_URI` debe apuntar a su conexión de MongoDB Atlas o a un MongoDB administrado por Railway.
+- `MONGODB_DB` debe ser el nombre de la base de datos usada por el backend.
+- No es necesario ni compatible usar variables como `MYSQL_URL`, `MYSQL_HOST`, `MYSQL_DATABASE`, `MYSQL_USER` o `MYSQL_PASSWORD`.
 
 ## ▶️ Operación conjunta frontend + backend
 
@@ -59,8 +80,8 @@ frontend/ Next.js App Router + TypeScript + Tailwind
         ▼ fetch REST
 backend/ Express.js + Joi + JWT + Canvas CAPTCHA
         │
-        ▼ mysql2/promise
-MySQL / Railway-compatible InnoDB schema
+        ▼ mongodb
+MongoDB Atlas / local MongoDB compatible
 ```
 
 ## 🛠️ Instrucciones para Instalación Local
@@ -68,15 +89,17 @@ MySQL / Railway-compatible InnoDB schema
 ### Requisitos previos
 
 - Node.js v18 o superior.
-- MySQL 8.x local o remoto.
+- MongoDB local o una instancia de MongoDB Atlas.
 
 ### Paso 1: Configurar la base de datos
 
-Ejecute el esquema DDL:
+Para un desarrollo local con Docker Compose:
 
 ```bash
-mysql -u root -p < backend/config/schema.sql
+docker compose up -d
 ```
+
+Si usa MongoDB Atlas, cree un clúster y copie la cadena de conexión en `backend/.env` como `MONGODB_URI`.
 
 ### Paso 2: Configuración del backend
 
@@ -91,20 +114,17 @@ Variables relevantes:
 
 ```env
 PORT=5000
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=tu_clave_local_mysql
-DB_NAME=wijutopia_db
-DB_PORT=3306
+MONGODB_URI=mongodb+srv://<usuario>:<contraseña>@cluster0.mongodb.net
+MONGODB_DB=wijutopia_db
 JWT_SECRET=secret_desarrollo_local_wijutopia_123
-CAPTCHA_KEY=8e9fb74ab1a89f81a7199c09930fca611a2f1b49e19dcaef18a66bc2df7f2931
+CAPTCHA_KEY=8e9fb74ab1a89f81a7199c09930fca611a2a3bc5d6a7ef
 CAPTCHA_IV=4b3d2b7e192a013e8d9a2a3bc5d6a7ef
 ADMIN_EMAIL=admin@wijutopia.com
 ADMIN_PASSWORD=WijuAdmin2026_TrujilloTcg!
 FRONTEND_ORIGIN=http://localhost:3000
 ```
 
-Para Railway puede usar `DB_URL=mysql://user:pass@host.railway.app:3306/wijutopia_db`.
+Para deploy en servicios como Railway o Render, use la URL de MongoDB Atlas en `MONGODB_URI`.
 
 ### Paso 3: Configuración del frontend
 
@@ -209,6 +229,6 @@ Cada página mantiene la jerarquía `Juego → Rama de catálogo → disponibili
 
 ## ☁️ Despliegue sugerido
 
-- MySQL: Railway.
+- MongoDB Atlas o un servicio administrado de MongoDB.
 - Backend Express: Render, raíz `backend/`, build `npm install`, start `npm start`.
 - Frontend Next.js: Vercel, raíz `frontend/`, variable `NEXT_PUBLIC_API_URL=https://wijutopia-backend.onrender.com`.

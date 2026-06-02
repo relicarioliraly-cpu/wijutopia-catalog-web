@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { CardsIcon, ChartIcon, SearchIcon, TagIcon } from '@/components/Icons';
 import ProductCard from '@/components/ProductCard';
 import { apiFetch, Product } from '@/lib/api';
+import { storeTagCatalog } from '@/lib/catalogTaxonomy';
 
 type SegmentedCatalogProps = {
   title: string;
@@ -29,6 +30,12 @@ export default function SegmentedCatalog({
   const [products, setProducts] = useState<Product[]>([]);
   const [message, setMessage] = useState('');
   const [query, setQuery] = useState('');
+  const [availability, setAvailability] = useState<'all' | 'available' | 'soldout'>('all');
+  const [productTagFilter, setProductTagFilter] = useState('all');
+  const [releaseStatus, setReleaseStatus] = useState<'all' | 'catalogo' | 'lanzamiento'>('all');
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
+  const [sortBy, setSortBy] = useState<'newest' | 'priceAsc' | 'priceDesc'>('newest');
 
   useEffect(() => {
     apiFetch<{ success: boolean; data: Product[] }>('/api/products')
@@ -40,17 +47,39 @@ export default function SegmentedCatalog({
   // página de etiqueta de tienda o rama transversal sin duplicar componentes.
   const filteredProducts = useMemo(() => {
     const terms = categoryMatch.map((item) => item.toLowerCase());
-    const q = query.toLowerCase();
-    return products.filter((product) => {
-      const availability = product.stock > 0 ? 'disponible' : 'agotado restock';
-      const haystack = `${product.name} ${product.description || ''} ${product.category || ''} ${product.product_tag || ''} ${product.release_status || ''} ${availability}`.toLowerCase();
-      const matchesGame = terms.length === 0 || terms.some((term) => haystack.includes(term));
-      const matchesStoreTag = !storeTagLabel || product.product_tag === storeTagLabel;
-      const matchesBranch = !branchLabel || haystack.includes(branchLabel.toLowerCase()) || branchLabel === 'Todos';
-      const matchesQuery = !q || haystack.includes(q);
-      return matchesGame && matchesStoreTag && matchesBranch && matchesQuery;
-    });
-  }, [branchLabel, categoryMatch, storeTagLabel, products, query]);
+    const q = query.toLowerCase().trim();
+    const numericQuery = Number(q);
+    const priceFilterActive = minPrice !== '' || maxPrice !== '';
+
+    return products
+      .filter((product) => {
+        const availabilityText = product.stock > 0 ? 'disponible' : 'agotado restock';
+        const haystack = `${product.name} ${product.description || ''} ${product.category || ''} ${product.product_tag || ''} ${product.release_status || ''} ${availabilityText}`.toLowerCase();
+        const matchesQuery = !q || haystack.includes(q) ||
+          (!Number.isNaN(numericQuery) && (Number(product.price) === numericQuery || product.stock === numericQuery));
+
+        const matchesGame = terms.length === 0 || terms.some((term) => haystack.includes(term));
+        const matchesStoreTag = !storeTagLabel || product.product_tag === storeTagLabel;
+        const matchesBranch = !branchLabel || haystack.includes(branchLabel.toLowerCase()) || branchLabel === 'Todos';
+        const matchesAvailability = availability === 'all' ||
+          (availability === 'available' && product.stock > 0) ||
+          (availability === 'soldout' && product.stock === 0);
+        const matchesProductTag = productTagFilter === 'all' || product.product_tag === productTagFilter;
+        const matchesReleaseStatus = releaseStatus === 'all' || product.release_status === releaseStatus;
+
+        const priceValue = Number(product.price || 0);
+        const matchesPrice = !priceFilterActive ||
+          ((minPrice === '' || priceValue >= Number(minPrice)) &&
+          (maxPrice === '' || priceValue <= Number(maxPrice)));
+
+        return matchesQuery && matchesGame && matchesStoreTag && matchesBranch && matchesAvailability && matchesProductTag && matchesReleaseStatus && matchesPrice;
+      })
+      .sort((a, b) => {
+        if (sortBy === 'priceAsc') return a.price - b.price;
+        if (sortBy === 'priceDesc') return b.price - a.price;
+        return new Date(b.created_at || '').getTime() - new Date(a.created_at || '').getTime();
+      });
+  }, [availability, branchLabel, categoryMatch, maxPrice, minPrice, productTagFilter, products, query, releaseStatus, sortBy, storeTagLabel]);
 
   // El seguimiento alimenta la lógica de restock por temporada del backend.
   const trackProductInterest = async (product: Product, eventType: 'view' | 'click') => {
@@ -95,17 +124,57 @@ export default function SegmentedCatalog({
         })}
       </section>
 
-      <section className="grid gap-4 rounded-3xl border border-wiju-borderLight bg-wiju-cardLight p-5 wiju-hover-lift dark:border-wiju-borderDark dark:bg-wiju-doorPurple/50 md:grid-cols-[1fr_auto]">
-        <label className="flex items-center gap-3 rounded-2xl border border-wiju-borderLight bg-white px-5 py-3 text-wiju-ink dark:border-wiju-borderDark">
-          <SearchIcon className="text-slate-400" />
+      <section className="space-y-4 rounded-3xl border border-wiju-borderLight bg-wiju-cardLight p-5 wiju-hover-lift dark:border-wiju-borderDark dark:bg-wiju-doorPurple/50">
+        <div className="grid gap-4 md:grid-cols-[1fr_auto]">
+          <label className="flex items-center gap-3 rounded-2xl border border-wiju-borderLight bg-white px-5 py-3 text-wiju-ink dark:border-wiju-borderDark">
+            <SearchIcon className="text-slate-400" />
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Buscar por carta, set, rareza, categoría, etiqueta..."
+              className="w-full bg-transparent outline-none"
+            />
+          </label>
+          <p className="rounded-2xl bg-wiju-signMagenta px-5 py-3 text-center font-black text-white shadow-neon dark:bg-wiju-moonGold dark:text-wiju-ink">{filteredProducts.length} resultados</p>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <select value={availability} onChange={(event) => setAvailability(event.target.value as any)} className="rounded-2xl border border-wiju-borderLight bg-white px-4 py-4 text-slate-900 focus:outline-none focus:ring-2 focus:ring-wiju-crimson dark:border-wiju-borderDark dark:bg-slate-950 dark:text-white">
+            <option value="all">Todos los estados</option>
+            <option value="available">Disponibles</option>
+            <option value="soldout">Agotados</option>
+          </select>
+          <select value={productTagFilter} onChange={(event) => setProductTagFilter(event.target.value)} className="rounded-2xl border border-wiju-borderLight bg-white px-4 py-4 text-slate-900 focus:outline-none focus:ring-2 focus:ring-wiju-crimson dark:border-wiju-borderDark dark:bg-slate-950 dark:text-white">
+            <option value="all">Todas las etiquetas</option>
+            {storeTagCatalog.map((tag) => <option key={tag.slug} value={tag.label}>{tag.label}</option>)}
+          </select>
+          <select value={releaseStatus} onChange={(event) => setReleaseStatus(event.target.value as any)} className="rounded-2xl border border-wiju-borderLight bg-white px-4 py-4 text-slate-900 focus:outline-none focus:ring-2 focus:ring-wiju-crimson dark:border-wiju-borderDark dark:bg-slate-950 dark:text-white">
+            <option value="all">Todas las ramas</option>
+            <option value="catalogo">Catálogo</option>
+            <option value="lanzamiento">Lanzamientos</option>
+          </select>
+          <select value={sortBy} onChange={(event) => setSortBy(event.target.value as any)} className="rounded-2xl border border-wiju-borderLight bg-white px-4 py-4 text-slate-900 focus:outline-none focus:ring-2 focus:ring-wiju-crimson dark:border-wiju-borderDark dark:bg-slate-950 dark:text-white">
+            <option value="newest">Más recientes</option>
+            <option value="priceAsc">Precio ascendente</option>
+            <option value="priceDesc">Precio descendente</option>
+          </select>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-3">
           <input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Buscar por carta, set, rareza, disponibilidad..."
-            className="w-full bg-transparent outline-none"
+            value={minPrice}
+            onChange={(event) => setMinPrice(event.target.value.replace(/[^0-9.]/g, ''))}
+            placeholder="Mínimo S/"
+            className="rounded-2xl border border-wiju-borderLight bg-white px-5 py-4 text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-wiju-crimson dark:border-wiju-borderDark dark:bg-slate-950 dark:text-white"
           />
-        </label>
-        <p className="rounded-2xl bg-wiju-signMagenta px-5 py-3 text-center font-black text-white shadow-neon dark:bg-wiju-moonGold dark:text-wiju-ink">{filteredProducts.length} resultados</p>
+          <input
+            value={maxPrice}
+            onChange={(event) => setMaxPrice(event.target.value.replace(/[^0-9.]/g, ''))}
+            placeholder="Máximo S/"
+            className="rounded-2xl border border-wiju-borderLight bg-white px-5 py-4 text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-wiju-crimson dark:border-wiju-borderDark dark:bg-slate-950 dark:text-white"
+          />
+          <button type="button" onClick={() => { setMinPrice(''); setMaxPrice(''); setAvailability('all'); setProductTagFilter('all'); setReleaseStatus('all'); setSortBy('newest'); }} className="rounded-2xl border border-wiju-borderLight bg-transparent px-5 py-4 text-slate-900 transition hover:bg-wiju-signMagenta/10 dark:border-wiju-borderDark dark:text-white">Limpiar filtros</button>
+        </div>
       </section>
 
       <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
