@@ -2,10 +2,13 @@
   "name": "wijutopia-frontend",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": ">=24.0.0"
+  },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "start": "next start -p ${PORT:-3000}",
+    "build": "NODE_OPTIONS='' next build",
+    "start": "NODE_OPTIONS='' next start -p ${PORT:-3000}",
     "lint": "next lint",
     "typecheck": "tsc --noEmit"
   },

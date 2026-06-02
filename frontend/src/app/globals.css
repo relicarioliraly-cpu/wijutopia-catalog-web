@@ -11,22 +11,24 @@ html.dark {
 }
 
 body {
-  @apply min-h-screen bg-wiju-lightBg text-wiju-textLight transition-colors dark:bg-wiju-darkBg dark:text-wiju-textDark;
+  @apply min-h-screen bg-wiju-lightBg text-wiju-textLight transition-colors duration-500 dark:bg-wiju-darkBg dark:text-wiju-textDark;
   background-image:
-    radial-gradient(circle at 14% 8%, rgba(244, 178, 58, 0.14), transparent 24rem),
-    radial-gradient(circle at 82% 4%, rgba(139, 29, 87, 0.22), transparent 28rem),
-    linear-gradient(180deg, rgba(91, 42, 134, 0.08), transparent 32rem);
+    radial-gradient(circle at 12% 10%, rgba(155, 109, 224, 0.18), transparent 22rem),
+    radial-gradient(circle at 86% 8%, rgba(142, 78, 196, 0.24), transparent 26rem),
+    linear-gradient(180deg, rgba(99, 61, 165, 0.08), transparent 30rem),
+    repeating-linear-gradient(120deg, transparent 0, transparent 4rem, rgba(121, 84, 204, 0.02) 4rem, rgba(121, 84, 204, 0.02) 8rem);
 }
 
 html.dark body {
   background-image:
-    radial-gradient(circle at 14% 8%, rgba(244, 178, 58, 0.18), transparent 22rem),
-    radial-gradient(circle at 78% 0%, rgba(139, 29, 87, 0.32), transparent 30rem),
-    linear-gradient(180deg, #24113f 0%, #100817 42%, #0b0b0f 100%);
+    radial-gradient(circle at 14% 8%, rgba(151, 101, 255, 0.22), transparent 20rem),
+    radial-gradient(circle at 78% 0%, rgba(155, 109, 224, 0.32), transparent 28rem),
+    linear-gradient(180deg, #120921 0%, #08050d 36%, #0b0b0f 100%),
+    repeating-linear-gradient(180deg, transparent 0, transparent 3rem, rgba(163, 101, 220, 0.03) 3rem, rgba(163, 101, 220, 0.03) 6rem);
 }
 
 .focus-ring {
-  @apply focus:outline-none focus:ring-2 focus:ring-wiju-moonGold focus:ring-offset-2 focus:ring-offset-wiju-darkBg;
+  @apply focus:outline-none focus:ring-2 focus:ring-wiju-crimson focus:ring-offset-2 focus:ring-offset-wiju-darkBg;
 }
 
 .wiju-night-sky {
@@ -34,11 +36,19 @@ html.dark body {
     radial-gradient(circle at 18% 18%, rgba(255,255,255,.9) 0 2px, transparent 3px),
     radial-gradient(circle at 64% 12%, rgba(255,255,255,.75) 0 2px, transparent 3px),
     radial-gradient(circle at 84% 28%, rgba(255,255,255,.65) 0 1.5px, transparent 3px),
-    linear-gradient(160deg, #5b2a86 0%, #24113f 48%, #0e3a3b 100%);
+    linear-gradient(160deg, #7242b8 0%, #2a0d4f 48%, #3e2467 100%);
 }
 
 .wiju-store-card {
-  background: linear-gradient(145deg, #5b2a86 0%, #3b2063 56%, #24113f 100%);
+  background: linear-gradient(145deg, #7242b8 0%, #482a7d 56%, #2a0d4f 100%);
+}
+
+.wiju-divider {
+  border-top: 1px solid rgba(147, 76, 205, 0.22);
+}
+
+.wiju-panel-border {
+  @apply border border-wiju-borderLight bg-wiju-cardLight/95 backdrop-blur-md dark:border-wiju-borderDark dark:bg-wiju-cardDark/95;
 }
 
 .wiju-glass-panel {

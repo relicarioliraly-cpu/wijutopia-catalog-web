@@ -6,33 +6,33 @@ module.exports = {
     extend: {
       colors: {
         wiju: {
-          darkBg: '#0B0B0F',
-          lightBg: '#F8F9FA',
-          cardDark: '#16161F',
-          cardLight: '#FFFFFF',
-          crimson: '#E50914',
-          crimsonLight: '#C10710',
-          gold: '#FFB300',
-          goldLight: '#E5A000',
-          borderDark: '#262636',
-          borderLight: '#E2E8F0',
-          textDark: '#F3F4F6',
-          textLight: '#111827',
-          purpleNight: '#24113F',
-          facadePurple: '#5B2A86',
-          signMagenta: '#6B073C',
-          logoWine: '#6B073C',
-          logoWineDark: '#3B0525',
-          doorPurple: '#3B2063',
-          moonGold: '#F4B23A',
-          sidewalkBlue: '#244C73',
-          tealShadow: '#0E3A3B',
-          ink: '#100817'
+          darkBg: '#08050d',
+          lightBg: '#120921',
+          cardDark: '#110a24',
+          cardLight: '#1e1145',
+          crimson: '#8C4FCC',
+          crimsonLight: '#A16DE5',
+          gold: '#B78CD6',
+          goldLight: '#C8A2E5',
+          borderDark: '#27144e',
+          borderLight: '#5d3b9f',
+          textDark: '#F6F0FF',
+          textLight: '#F9F5FF',
+          purpleNight: '#2a0d4f',
+          facadePurple: '#7b4cc7',
+          signMagenta: '#9b6aff',
+          logoWine: '#7242b8',
+          logoWineDark: '#482a7d',
+          doorPurple: '#3e2467',
+          moonGold: '#a950d4',
+          sidewalkBlue: '#6b4ab4',
+          tealShadow: '#3e1d76',
+          ink: '#0d061a'
         }
       },
       boxShadow: {
         card: '0 20px 60px rgba(0, 0, 0, 0.25)',
-        neon: '0 0 28px rgba(244, 178, 58, 0.35), 0 0 56px rgba(139, 29, 87, 0.25)'
+        neon: '0 0 28px rgba(151, 101, 255, 0.35), 0 0 56px rgba(101, 53, 183, 0.25)'
       },
       animation: {
         float: 'float 5s ease-in-out infinite',
