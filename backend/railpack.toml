@@ -1,0 +1,7 @@
+# Railway/Railpack config for backend service.
+# Use this file when the backend rootDirectory is set to backend.
+[build]
+cmd = "npm install"
+
+[start]
+cmd = "npm start"
