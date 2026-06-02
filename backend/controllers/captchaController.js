@@ -1,5 +1,5 @@
-const { createCanvas } = require('canvas');
 const crypto = require('crypto');
+const svgCaptcha = require('svg-captcha');
 
 const getCipherConfig = () => ({
     key: Buffer.from(process.env.CAPTCHA_KEY || '8e9fb74ab1a89f81a7199c09930fca611a2f1b49e19dcaef18a66bc2df7f2931', 'hex'),
@@ -24,41 +24,23 @@ const decryptCaptcha = (token) => {
 
 const generateCaptcha = (req, res) => {
     try {
-        const canvas = createCanvas(200, 80);
-        const ctx = canvas.getContext('2d');
-        const captchaText = crypto.randomBytes(3).toString('hex').toUpperCase();
-
-        const grad = ctx.createLinearGradient(0, 0, 200, 80);
-        grad.addColorStop(0, '#1E1E24');
-        grad.addColorStop(1, '#0F0F12');
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, 200, 80);
-
-        ctx.strokeStyle = '#DC2626';
-        ctx.lineWidth = 2;
-        for (let i = 0; i < 5; i += 1) {
-            ctx.beginPath();
-            ctx.moveTo(Math.random() * 200, Math.random() * 80);
-            ctx.lineTo(Math.random() * 200, Math.random() * 80);
-            ctx.stroke();
-        }
-
-        ctx.fillStyle = '#FFB300';
-        ctx.font = 'bold 30px sans-serif';
-        for (let i = 0; i < captchaText.length; i += 1) {
-            ctx.save();
-            ctx.translate(30 + i * 25, 45 + (Math.random() - 0.5) * 15);
-            ctx.rotate((Math.random() - 0.5) * 0.4);
-            ctx.fillText(captchaText[i], 0, 0);
-            ctx.restore();
-        }
+        const captcha = svgCaptcha.create({
+            size: 6,
+            noise: 3,
+            color: true,
+            background: '#0F0F12',
+            width: 240,
+            height: 80,
+            charPreset: 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+        });
 
         const expiry = Date.now() + 5 * 60 * 1000;
-        const captchaToken = encryptCaptcha({ text: captchaText, expiry });
+        const captchaToken = encryptCaptcha({ text: captcha.text, expiry });
+        const captchaDataUrl = `data:image/svg+xml;base64,${Buffer.from(captcha.data).toString('base64')}`;
 
         return res.status(200).json({
             success: true,
-            captchaImage: canvas.toDataURL(),
+            captchaImage: captchaDataUrl,
             captchaToken
         });
     } catch (error) {
