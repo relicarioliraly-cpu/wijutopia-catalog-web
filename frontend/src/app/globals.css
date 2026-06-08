@@ -322,3 +322,137 @@ tbody tr:hover {
     scroll-behavior: auto !important;
   }
 }
+/* =========================================
+   WIJUTOPIA BINDER + BOTTOM NAV EXPERIENCE
+========================================= */
+
+html:not(.dark) {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+html:not(.dark) body {
+  color: #1e130c;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(169, 80, 212, .16), transparent 24rem),
+    radial-gradient(circle at 88% 12%, rgba(216, 161, 38, .20), transparent 28rem),
+    linear-gradient(180deg, #fff8e8 0%, #f0ddbc 42%, #c9a26d 100%);
+}
+
+body {
+  padding-bottom: 7.5rem;
+}
+
+html:not(.dark) input,
+html:not(.dark) textarea,
+html:not(.dark) select {
+  color: #1e130c;
+}
+
+.wiju-bottom-nav nav {
+  background:
+    linear-gradient(90deg, rgba(92, 50, 22, .96), rgba(124, 74, 35, .98), rgba(71, 38, 18, .96)),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.08) 0 1px, transparent 1px 18px),
+    repeating-linear-gradient(0deg, rgba(0,0,0,.16) 0 2px, transparent 2px 9px);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.18),
+    inset 0 -10px 24px rgba(0,0,0,.28),
+    0 22px 55px rgba(0,0,0,.42);
+}
+
+.wiju-bottom-nav-item {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: .55rem;
+  overflow: hidden;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 232, 181, .22);
+  background: linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.04));
+  padding: .72rem;
+  color: #fff8ea;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.12);
+  transition: width .24s ease, padding .24s ease, transform .2s ease, border-color .2s ease, background .2s ease;
+}
+
+.wiju-bottom-nav-item:hover,
+.wiju-bottom-nav-item:focus-visible,
+.wiju-bottom-nav details[open] > summary.wiju-bottom-nav-item,
+.wiju-bottom-nav:focus-within .wiju-bottom-nav-item,
+.wiju-bottom-nav:hover .wiju-bottom-nav-item {
+  border-color: rgba(242, 197, 92, .78);
+  background: linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.08));
+  transform: translateY(-2px);
+}
+
+.wiju-nav-label {
+  display: inline-block;
+  max-width: 0;
+  white-space: nowrap;
+  opacity: 0;
+  transition: max-width .24s ease, opacity .2s ease;
+}
+
+.wiju-bottom-nav:hover .wiju-nav-label,
+.wiju-bottom-nav:focus-within .wiju-nav-label,
+.wiju-bottom-brand .wiju-nav-label {
+  max-width: 9rem;
+  opacity: 1;
+}
+
+.wiju-binder-shell {
+  position: relative;
+}
+
+.wiju-binder-shell::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: .32;
+  background:
+    radial-gradient(circle at 18% 24%, rgba(255, 203, 64, .18) 0 0.45rem, transparent .48rem),
+    radial-gradient(circle at 82% 28%, rgba(114, 66, 184, .20) 0 .55rem, transparent .58rem),
+    linear-gradient(135deg, transparent 0 46%, rgba(255,255,255,.08) 46% 47%, transparent 47% 100%);
+  background-size: 14rem 14rem, 16rem 16rem, 9rem 9rem;
+}
+
+.wiju-binder-grid {
+  background:
+    linear-gradient(90deg, rgba(68, 37, 18, .88), rgba(112, 66, 31, .78), rgba(61, 34, 18, .88)),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.06) 0 1px, transparent 1px 22px),
+    repeating-linear-gradient(0deg, rgba(0,0,0,.14) 0 2px, transparent 2px 12px);
+  border: 1px solid rgba(69, 35, 16, .72);
+  box-shadow: inset 0 0 0 10px rgba(63, 34, 16, .34), 0 22px 65px rgba(28, 12, 4, .30);
+}
+
+.wiju-showcase-card {
+  position: relative;
+}
+
+.wiju-showcase-card::after {
+  content: '';
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(120deg, rgba(255,255,255,.30), transparent 24%, transparent 72%, rgba(255,255,255,.18));
+  mix-blend-mode: screen;
+  opacity: .55;
+}
+
+@media (max-width: 640px) {
+  body {
+    padding-bottom: 6.75rem;
+  }
+
+  .wiju-bottom-nav-item {
+    min-height: 2.55rem;
+    padding: .62rem;
+  }
+}
