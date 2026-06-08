@@ -1,17 +1,14 @@
 {
-  "name": "wijutopia-tcg-fullstack",
+  "name": "wijutopia-catalog-web",
   "version": "1.0.0",
   "private": true,
-  "description": "Orquestador local para ejecutar el backend Express y el frontend Next.js del prototipo Wijutopia TCG.",
+  "description": "Catálogo Web Público de Wijutopia TCG - Frontend puro con Next.js + React 18",
   "scripts": {
-    "install:all": "npm --prefix backend install && npm --prefix frontend install",
-    "dev": "sh -c 'npm --prefix backend run dev & npm --prefix frontend run dev; wait'",
-    "dev:backend": "npm --prefix backend run dev",
-    "dev:frontend": "npm --prefix frontend run dev",
-    "start:backend": "npm --prefix backend start",
-    "start:frontend": "npm --prefix frontend start",
-    "lint": "npm --prefix backend run lint",
-    "typecheck": "npm --prefix frontend run typecheck",
-    "check": "npm run lint && npm run typecheck"
+    "install": "npm install",
+    "dev": "next dev",
+    "build": "NODE_OPTIONS='' next build",
+    "start": "NODE_OPTIONS='' next start -p ${PORT:-3000}",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
   }
 }

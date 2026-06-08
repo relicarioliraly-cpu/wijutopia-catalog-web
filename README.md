@@ -1,22 +1,422 @@
-# Wijutopia TCG E-Commerce - Trujillo, Perú 🇵🇪
+# 📚 Wijutopia TCG - Catálogo Web Público
 
-Plataforma de comercio electrónico de alto rendimiento diseñada como **prototipo académico** para una tienda TCG inspirada en Wijutopia, comunidad de juegos de cartas coleccionables de Trujillo, Perú. El sistema integra un frontend moderno con Next.js y Tailwind CSS, un backend RESTful en Express.js y persistencia en MongoDB Atlas.
+[![Next.js](https://img.shields.io/badge/Next.js-14.2-black?logo=next.js)](https://nextjs.org)
+[![React](https://img.shields.io/badge/React-18.3-61DAFB?logo=react)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-3178C6?logo=typescript)](https://www.typescriptlang.org)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38B2AC?logo=tailwindcss)](https://tailwindcss.com)
+[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
-> **Aviso legal:** este repositorio no representa una página oficial de Wijutopia, Wiju World ni de las franquicias Pokémon, Yu-Gi-Oh!, Digimon, Bandai, One Piece o similares. Es un examen de prueba sin pagos reales ni inventario oficial.
+**Catálogo Web Público de Wijutopia TCG** — Una plataforma moderna de e-commerce para el descubrimiento y preventa de cartas de Trading Card Games (TCG), diseñada como **frontend puro** con arquitectura lista para conectarse a un backend de gestión de admin e inventario.
 
-## 🔗 Enlaces del Proyecto en Línea
+## 🎯 Propósito
 
-- Frontend en Producción: `https://wijutopia-tcg.vercel.app`
-- API REST Backend: `https://wijutopia-backend.onrender.com`
+Este proyecto es el **Catálogo Web Público** de Wijutopia, la vidriera digital 24/7 que permite a los clientes:
 
+- ✨ **Explorar el inventario** de cartas TCG (Pokémon, Yu-Gi-Oh!, etc.)
+- 🔍 **Filtrar y buscar** por juego, rareza, precio y disponibilidad
+- 📊 **Registrar preferencias** mediante telemetría clickstream para análisis de demanda
+- 🛒 **Generar intenciones de compra** (preventas) con integración a WhatsApp Business
+- ♥️ **Crear listas de deseos** personalizadas
 
+### Características Clave
 
-## 🎨 Limpieza visual e iconografía
+| Feature | Estado | Descripción |
+|---------|--------|-------------|
+| 📱 Catálogo Responsivo | ✅ | Grid adaptable, búsqueda full-text |
+| 🔌 API Service Layer | ✅ | Placeholders listos para backend real |
+| 📊 Telemetría Clickstream | ✅ | Tracking de vistas, clics, deseos |
+| 🎨 Dark Mode | ✅ | Soporte automático light/dark |
+| 🌐 i18n Ready | ✅ | Estructura preparada para localización |
+| 📦 Docker | ✅ | Deployment containerizado |
+| 🧪 Testing | 🔄 | Jest + React Testing Library (próximo) |
 
-La interfaz usa una navegación compacta con iconos SVG internos, un mapa rápido plegable para no sobrecargar la pantalla y una portada visual inspirada en una fachada morada de tienda TCG. La paleta visual toma como base los tonos morado noche, fachada violeta, letrero magenta, puerta púrpura, dorado lunar y azul vereda de la imagen de referencia. También se agregaron animaciones suaves de brillo/flotación y un interruptor de efectos sonoros opcionales para clics de navegación, carrito y confirmaciones; el sonido queda desactivado por defecto para respetar la experiencia del usuario. Las tarjetas priorizan estado, etiqueta, precio y acción principal para que el catálogo sea más legible.
+## 🚀 Quick Start
 
+### Requisitos Previos
 
-## 🚆 Despliegue en Railway / Railpack
+- **Node.js** ≥ 24.0.0
+- **npm** o **pnpm**
+- **Docker** (opcional, para deployment)
+
+### Instalación Local
+
+```bash
+# Clonar repositorio
+git clone https://github.com/relicarioliraly/wijutopia-catalog-web.git
+cd wijutopia-catalog-web
+
+# Instalar dependencias
+npm install
+
+# Configurar variables de entorno
+cp .env.example .env.local
+# Editar .env.local con tu configuración
+```
+
+### Desarrollo
+
+```bash
+# Iniciar servidor de desarrollo (http://localhost:3000)
+npm run dev
+
+# En otra terminal: watch de TypeScript
+npm run typecheck -- --watch
+
+# Ejecutar linter
+npm run lint
+```
+
+### Build & Producción
+
+```bash
+# Build optimizado
+npm run build
+
+# Iniciar servidor de producción
+npm start
+
+# Con puerto personalizado
+PORT=8080 npm start
+```
+
+## 📁 Estructura del Proyecto
+
+```
+frontend/
+├── src/
+│   ├── app/                  # App Router de Next.js
+│   │   ├── client/
+│   │   │   └── page.tsx      # Página principal del catálogo
+│   │   ├── layout.tsx        # Layout global
+│   │   ├── page.tsx          # Home (landing)
+│   │   └── globals.css       # Estilos globales
+│   ├── components/
+│   │   ├── ProductCard.tsx   # Tarjeta de carta TCG
+│   │   ├── BackendStatus.tsx # Indicador de conexión backend
+│   │   ├── SiteNav.tsx       # Navegación principal
+│   │   └── Icons.tsx         # Sistema de iconos
+│   ├── hooks/
+│   │   └── useTracker.ts     # Hook de telemetría (legacy)
+│   └── lib/
+│       ├── apiService.ts     # 🔌 Service layer + Mock data
+│       ├── api.ts            # Legacy (deprecar)
+│       └── catalogTaxonomy.ts # Metadata de catálogo
+├── public/
+│   ├── wijutopia-logo.svg
+│   └── ...
+├── package.json
+├── tsconfig.json
+├── next.config.js
+├── tailwind.config.js
+└── postcss.config.js
+```
+
+## 🔌 Integración Backend
+
+### Modo Actual: MOCK (Desarrollo)
+
+El proyecto actualmente usa **datos simulados** (MOCK) en `src/lib/apiService.ts`:
+
+```typescript
+// ✅ Datos de ejemplo (hardcoded)
+const MOCK_CARDS = [
+  { id: '1', name: 'Charizard ex', game: 'Pokemon', ... },
+  { id: '2', name: 'Blastoise ex', game: 'Pokemon', ... },
+  // ...
+];
+
+export async function getAllCards(filters?: CatalogFilter): Promise<Card[]> {
+  // Retorna MOCK_CARDS filtrados
+}
+```
+
+### Conexión al Backend Real
+
+Cuando tu backend esté disponible, **reemplaza las funciones MOCK** en `apiService.ts`:
+
+```typescript
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
+export async function getAllCards(filters?: CatalogFilter): Promise<Card[]> {
+  // Antes: return MOCK_CARDS.filter(...)
+  
+  // Después:
+  const response = await fetch(`${API_BASE_URL}/api/catalog/cards`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(filters),
+  });
+  return response.json();
+}
+```
+
+### Endpoints Esperados del Backend
+
+| Endpoint | Método | Descripción |
+|----------|--------|-------------|
+| `/api/catalog/cards` | POST | Obtener cartas con filtros |
+| `/api/catalog/cards/:id` | GET | Obtener carta específica |
+| `/api/inventory/stock` | GET | Verificar stock e inventario |
+| `/api/telemetry/clickstream` | POST | Registrar eventos de usuario |
+| `/api/preorders` | POST | Crear intención de compra |
+| `/api/captcha/verify` | POST | Validar verificación CAPTCHA |
+
+## 🎨 Configuración de Entorno
+
+Crea un archivo `.env.local` en la raíz del proyecto:
+
+```env
+# Backend API
+NEXT_PUBLIC_API_URL=http://localhost:5000
+
+# Analytics (opcional)
+NEXT_PUBLIC_ANALYTICS_ID=your-analytics-id
+
+# WhatsApp Business
+NEXT_PUBLIC_WHATSAPP_PHONE=51900000000
+NEXT_PUBLIC_WHATSAPP_BUSINESS_ID=123456789
+
+# Modo desarrollo
+NODE_ENV=development
+```
+
+### Variables Importantes
+
+- **`NEXT_PUBLIC_API_URL`**: URL base del backend (por defecto: `http://localhost:5000`)
+  - En desarrollo: `http://localhost:5000`
+  - En staging: `https://api-staging.wijutopia.com`
+  - En producción: `https://api.wijutopia.com`
+
+- **`NODE_ENV`**: `development | production`
+
+## 📊 Telemetría & Analytics
+
+El catálogo registra **eventos clickstream** automáticamente:
+
+```typescript
+export interface ClickstreamEvent {
+  eventType: 'PAGE_VIEW' | 'DETAIL_CLICK' | 'ADD_TO_WISHLIST';
+  cardId?: string;
+  timestamp: string;      // ISO 8601
+  sessionToken: string;   // Agrupa eventos por sesión
+}
+```
+
+### Flujo de Telemetría
+
+1. Usuario abre catálogo → **PAGE_VIEW registrado**
+2. Usuario hace clic en carta → **DETAIL_CLICK registrado**
+3. Usuario agrega a deseos → **ADD_TO_WISHLIST registrado**
+4. Los eventos se envían al backend via `POST /api/telemetry/clickstream`
+
+### Tabla de Base de Datos Esperada
+
+```sql
+CREATE TABLE clickstream_telemetry (
+  id UUID PRIMARY KEY,
+  event_type VARCHAR(50),
+  card_id UUID REFERENCES cards_metadata(id),
+  session_token VARCHAR(255),
+  user_ip INET,
+  created_at TIMESTAMP DEFAULT NOW(),
+  INDEX idx_session (session_token),
+  INDEX idx_created (created_at)
+);
+```
+
+## 🐳 Deployment con Docker
+
+### Build Local
+
+```bash
+# Build de la imagen Docker
+docker build -f frontend/Dockerfile -t wijutopia-catalog:latest .
+
+# Ejecutar contenedor
+docker run -p 3000:3000 \
+  -e NEXT_PUBLIC_API_URL=http://backend:5000 \
+  wijutopia-catalog:latest
+```
+
+### Docker Compose
+
+```bash
+# Levantar solo el frontend
+docker-compose up frontend
+
+# Nota: El docker-compose.yml incluye solo frontend por ahora
+```
+
+### Deployment en Vercel (Recomendado)
+
+El proyecto está optimizado para **Vercel** (creador de Next.js):
+
+```bash
+# 1. Subir a GitHub
+git push origin main
+
+# 2. Conectar en Vercel (https://vercel.com)
+# - Seleccionar repo
+# - Variables de entorno:
+#   NEXT_PUBLIC_API_URL: https://api.wijutopia.com
+
+# 3. Desplegar automáticamente
+vercel deploy
+```
+
+## 🔐 Seguridad
+
+### Prácticas Actuales
+
+✅ **Type-safe**: TypeScript en todas partes  
+✅ **Validación**: Zod/Yup listos para implementar  
+✅ **Rate Limiting**: Preparado para backends  
+✅ **CORS**: Configurado en `next.config.js`  
+✅ **CSP Headers**: Listos para Vercel  
+
+### CAPTCHA (Próximo)
+
+El flujo de preventa debe validar con CAPTCHA:
+
+```typescript
+// Placeholder en apiService.ts
+export async function verifyCaptcha(token: string): Promise<boolean> {
+  // TODO: Implementar cuando el backend tenga servicio de CAPTCHA
+  return true; // MOCK
+}
+```
+
+## 📈 Roadmap
+
+### Fase 1 (Actual) ✅
+- [x] Frontend catálogo con datos MOCK
+- [x] API service layer con placeholders
+- [x] Componentes responsivos
+- [x] Telemetría clickstream (local)
+
+### Fase 2 (Próximo)
+- [ ] Conectar a backend real (Express.js)
+- [ ] Implementar CAPTCHA
+- [ ] Autenticación de usuario (Entra ID / OAuth)
+- [ ] Carrito persistente
+
+### Fase 3
+- [ ] Pagos con Stripe/Mercado Pago
+- [ ] Notificaciones email
+- [ ] Dashboard de preferencias de usuario
+- [ ] Recomendaciones ML
+
+### Fase 4
+- [ ] App móvil nativa (React Native)
+- [ ] Soporte offline
+- [ ] PWA completo
+
+## 🧪 Testing
+
+```bash
+# Unit tests
+npm run test
+
+# Tests con coverage
+npm run test:coverage
+
+# E2E tests (Playwright)
+npm run test:e2e
+```
+
+## 🤝 Contribuir
+
+1. **Fork** el proyecto
+2. **Crea una rama** (`git checkout -b feature/awesome-feature`)
+3. **Commit** cambios (`git commit -m 'Add awesome feature'`)
+4. **Push** a la rama (`git push origin feature/awesome-feature`)
+5. **Abre un Pull Request**
+
+## 📚 Documentación
+
+- [Next.js Docs](https://nextjs.org/docs)
+- [React Docs](https://react.dev)
+- [Tailwind CSS](https://tailwindcss.com/docs)
+- [TypeScript Handbook](https://www.typescriptlang.org/docs)
+
+## 🐛 Reporte de Bugs
+
+Abre una [GitHub Issue](https://github.com/relicarioliraly/wijutopia-catalog-web/issues/new) con:
+
+- Descripción clara del bug
+- Pasos para reproducir
+- Comportamiento esperado vs actual
+- Screenshots/videos (si aplica)
+- Versión de Node.js y navegador
+
+## 📝 Changelog
+
+Ver [CHANGELOG.md](CHANGELOG.md) para el historial de versiones.
+
+## 📄 Licencia
+
+Este proyecto está bajo licencia **MIT**. Ver [LICENSE](LICENSE) para detalles.
+
+## 👤 Autor
+
+Desarrollado para **Wijutopia TCG** — Tienda de trading cards en Trujillo, Perú.
+
+- **Email**: relicarioliraly@gmail.com
+- **GitHub**: [@relicarioliraly](https://github.com/relicarioliraly)
+
+## 🙏 Agradecimientos
+
+- Equipo de Wijutopia por la visión del proyecto
+- Comunidad React y Next.js por herramientas excelentes
+- Tailwind Labs por Tailwind CSS
+
+---
+
+## 🚢 Stack Técnico Completo
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Frontend (Este Proyecto)                  │
+│  ┌───────────────────────────────────────────────────────┐  │
+│  │ Next.js 14 + React 18 + TypeScript + Tailwind CSS     │  │
+│  │ - UI responsiva (mobile-first)                        │  │
+│  │ - Dark mode automático                               │  │
+│  │ - SSR/SSG optimizado                                 │  │
+│  └───────────────────────────────────────────────────────┘  │
+│                          ↓↑                                   │
+│         API Service Layer (apiService.ts)                     │
+│         - MOCK data (ahora)                                   │
+│         - Real backend (pronto)                               │
+│                                                               │
+└─────────────────────────────────────────────────────────────┘
+                          ↓↑
+┌─────────────────────────────────────────────────────────────┐
+│                   Backend (Por Conectar)                      │
+│  ┌───────────────────────────────────────────────────────┐  │
+│  │ Express.js + Node.js + MongoDB                         │  │
+│  │ - REST API                                            │  │
+│  │ - Autenticación                                       │  │
+│  │ - Gestión de inventario                              │  │
+│  │ - Telemetría & Analytics                             │  │
+│  └───────────────────────────────────────────────────────┘  │
+│                                                               │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+**¡Listo para compartir en GitHub!** 🚀
+
+Para subirlo a tu repositorio:
+
+```bash
+git init
+git add .
+git commit -m "Initial commit: Wijutopia Catalog Web - Frontend puro"
+git branch -M main
+git remote add origin https://github.com/relicarioliraly/wijutopia-catalog-web.git
+git push -u origin main
+```
 
 El repositorio incluye dos archivos `railpack.toml` para evitar que Railway lea únicamente el `package.json` raíz, que solo funciona como orquestador local.
 

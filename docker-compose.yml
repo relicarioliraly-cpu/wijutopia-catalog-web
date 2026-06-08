@@ -1,33 +1,6 @@
 version: '3.9'
 
 services:
-  db:
-    image: mongo:6.0
-    restart: unless-stopped
-    volumes:
-      - db_data:/data/db
-    ports:
-      - "27017:27017"
-
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    ports:
-      - "5000:5000"
-    environment:
-      PORT: 5000
-      MONGODB_URI: mongodb://db:27017
-      MONGODB_DB: wijutopia_db
-      JWT_SECRET: secret_desarrollo_local_wijutopia_123
-      CAPTCHA_KEY: 8e9fb74ab1a89f81a7199c09930fca611a2f1b49e19dcaef18a66bc2df7f2931
-      CAPTCHA_IV: 4b3d2b7e192a013e8d9a2a3bc5d6a7ef
-      ADMIN_EMAIL: admin@wijutopia.com
-      ADMIN_PASSWORD: WijuAdmin2026_TrujilloTcg!
-      FRONTEND_ORIGIN: http://localhost:3000
-    depends_on:
-      - db
-
   frontend:
     build:
       context: ./frontend
@@ -36,9 +9,8 @@ services:
       - "3000:3000"
     environment:
       NODE_ENV: production
-      NEXT_PUBLIC_API_URL: http://backend:5000
-    depends_on:
-      - backend
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:5000}
+    restart: unless-stopped
 
 volumes:
   db_data:

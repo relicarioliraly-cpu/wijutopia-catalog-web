@@ -2,70 +2,301 @@
 @tailwind components;
 @tailwind utilities;
 
+/* =========================================
+   WIJUTOPIA OFFICIAL THEME
+========================================= */
+
 :root {
-  color-scheme: light;
+  color-scheme: dark;
+
+  --wiju-black: #0b0b0f;
+  --wiju-black-soft: #121218;
+
+  --wiju-wine: #5c002e;
+  --wiju-wine-dark: #3d001f;
+  --wiju-wine-light: #7a0b43;
+
+  --wiju-purple: #3c0f56;
+  --wiju-purple-dark: #24113f;
+
+  --wiju-gold: #d8a126;
+  --wiju-gold-light: #f2c55c;
+
+  --wiju-text: #ffffff;
+  --wiju-text-soft: #d7d7d7;
+
+  --wiju-border: rgba(216,161,38,.15);
 }
 
-html.dark {
-  color-scheme: dark;
+/* =========================================
+   BODY
+========================================= */
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  @apply min-h-screen bg-wiju-lightBg text-wiju-textLight transition-colors duration-500 dark:bg-wiju-darkBg dark:text-wiju-textDark;
-  background-image:
-    radial-gradient(circle at 12% 10%, rgba(155, 109, 224, 0.18), transparent 22rem),
-    radial-gradient(circle at 86% 8%, rgba(142, 78, 196, 0.24), transparent 26rem),
-    linear-gradient(180deg, rgba(99, 61, 165, 0.08), transparent 30rem),
-    repeating-linear-gradient(120deg, transparent 0, transparent 4rem, rgba(121, 84, 204, 0.02) 4rem, rgba(121, 84, 204, 0.02) 8rem);
-}
+  min-height: 100vh;
 
-html.dark body {
-  background-image:
-    radial-gradient(circle at 14% 8%, rgba(151, 101, 255, 0.22), transparent 20rem),
-    radial-gradient(circle at 78% 0%, rgba(155, 109, 224, 0.32), transparent 28rem),
-    linear-gradient(180deg, #120921 0%, #08050d 36%, #0b0b0f 100%),
-    repeating-linear-gradient(180deg, transparent 0, transparent 3rem, rgba(163, 101, 220, 0.03) 3rem, rgba(163, 101, 220, 0.03) 6rem);
-}
+  color: var(--wiju-text);
 
-.focus-ring {
-  @apply focus:outline-none focus:ring-2 focus:ring-wiju-crimson focus:ring-offset-2 focus:ring-offset-wiju-darkBg;
-}
-
-.wiju-night-sky {
   background:
-    radial-gradient(circle at 18% 18%, rgba(255,255,255,.9) 0 2px, transparent 3px),
-    radial-gradient(circle at 64% 12%, rgba(255,255,255,.75) 0 2px, transparent 3px),
-    radial-gradient(circle at 84% 28%, rgba(255,255,255,.65) 0 1.5px, transparent 3px),
-    linear-gradient(160deg, #7242b8 0%, #2a0d4f 48%, #3e2467 100%);
+    radial-gradient(
+      circle at 10% 10%,
+      rgba(92,0,46,.25),
+      transparent 25rem
+    ),
+
+    radial-gradient(
+      circle at 85% 5%,
+      rgba(60,15,86,.22),
+      transparent 30rem
+    ),
+
+    linear-gradient(
+      180deg,
+      #2a0d1f 0%,
+      #1b101f 30%,
+      #121218 65%,
+      #0b0b0f 100%
+    );
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.wiju-store-card {
-  background: linear-gradient(145deg, #7242b8 0%, #482a7d 56%, #2a0d4f 100%);
+/* =========================================
+   NAVBAR
+========================================= */
+
+.wiju-navbar {
+  background:
+    linear-gradient(
+      90deg,
+      #5c002e 0%,
+      #650637 30%,
+      #5c002e 100%
+    );
+
+  border-bottom: 2px solid var(--wiju-gold);
+
+  box-shadow:
+    0 4px 25px rgba(0,0,0,.35);
 }
 
-.wiju-divider {
-  border-top: 1px solid rgba(147, 76, 205, 0.22);
+/* =========================================
+   BOTONES NAVBAR
+========================================= */
+
+.wiju-nav-btn {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,.08),
+      rgba(255,255,255,.03)
+    );
+
+  border: 1px solid rgba(255,255,255,.12);
+
+  border-radius: 999px;
+
+  color: white;
+
+  transition: .25s;
 }
 
-.wiju-panel-border {
-  @apply border border-wiju-borderLight bg-wiju-cardLight/95 backdrop-blur-md dark:border-wiju-borderDark dark:bg-wiju-cardDark/95;
+.wiju-nav-btn:hover {
+  border-color: rgba(216,161,38,.35);
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,.14),
+      rgba(255,255,255,.08)
+    );
+
+  transform: translateY(-1px);
 }
+
+/* =========================================
+   HERO
+========================================= */
+
+.wiju-hero {
+  background:
+    linear-gradient(
+      135deg,
+      #050507,
+      #130816,
+      #1f0822
+    );
+
+  border: 1px solid rgba(216,161,38,.12);
+
+  border-radius: 2rem;
+
+  box-shadow:
+    0 15px 40px rgba(0,0,0,.35);
+}
+
+/* =========================================
+   CARDS
+========================================= */
+
+.wiju-card {
+  background:
+    linear-gradient(
+      145deg,
+      #130816,
+      #1c0a20
+    );
+
+  border: 1px solid rgba(216,161,38,.10);
+
+  border-radius: 1.5rem;
+
+  transition: .25s;
+}
+
+.wiju-card:hover {
+  transform: translateY(-3px);
+
+  box-shadow:
+    0 12px 35px rgba(0,0,0,.35);
+}
+
+/* =========================================
+   PANEL GLASS
+========================================= */
 
 .wiju-glass-panel {
-  @apply border border-white/10 bg-white/10 backdrop-blur-md;
+  background: rgba(255,255,255,.03);
+
+  border: 1px solid rgba(255,255,255,.05);
+
+  backdrop-filter: blur(14px);
 }
 
-.wiju-hover-lift {
-  @apply transition duration-300 hover:-translate-y-1 hover:shadow-neon;
+/* =========================================
+   INPUTS
+========================================= */
+
+input,
+textarea,
+select {
+  background: rgba(255,255,255,.03);
+
+  border: 1px solid rgba(255,255,255,.08);
+
+  color: white;
+
+  transition: .2s;
 }
+
+input::placeholder,
+textarea::placeholder {
+  color: rgba(255,255,255,.45);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+
+  border-color: var(--wiju-gold);
+
+  box-shadow:
+    0 0 0 3px rgba(216,161,38,.15);
+}
+
+/* =========================================
+   TABLAS
+========================================= */
+
+thead {
+  background: rgba(255,255,255,.03);
+}
+
+tbody tr {
+  transition: .2s;
+}
+
+tbody tr:hover {
+  background: rgba(255,255,255,.03);
+}
+
+/* =========================================
+   BOTONES
+========================================= */
+
+.btn-primary {
+  background: var(--wiju-wine);
+
+  color: white;
+
+  border: none;
+}
+
+.btn-primary:hover {
+  background: var(--wiju-wine-light);
+}
+
+.btn-gold {
+  background: var(--wiju-gold);
+
+  color: #111;
+}
+
+.btn-gold:hover {
+  background: var(--wiju-gold-light);
+}
+
+/* =========================================
+   SHADOWS
+========================================= */
+
+.shadow-card {
+  box-shadow:
+    0 15px 40px rgba(0,0,0,.30);
+}
+
+.shadow-neon {
+  box-shadow:
+    0 0 18px rgba(92,0,46,.25);
+}
+
+/* =========================================
+   SCROLLBAR
+========================================= */
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #121218;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #5c002e;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #7a0b43;
+}
+
+/* =========================================
+   ACCESSIBILITY
+========================================= */
 
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
     scroll-behavior: auto !important;
-    transition-duration: 0.01ms !important;
   }
 }

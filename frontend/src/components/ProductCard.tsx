@@ -1,123 +1,141 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import { CartIcon, ClockIcon, SparkIcon, TagIcon } from '@/components/Icons';
-import { Product } from '@/lib/api';
-import { useTracker } from '@/hooks/useTracker';
-
-type ActiveRestock = {
-  id: string;
-  customerEmail: string;
-  status: string;
-};
+import { CartIcon, TagIcon, SparkIcon } from '@/components/Icons';
+import { Card, createPreorderIntent, trackPageView, trackAddToWishlist } from '@/lib/apiService';
 
 type ProductCardProps = {
-  product: Product;
-  activeRestock?: ActiveRestock;
-  onAddToCart?: (product: Product) => void;
-  onRestockRequest?: (product: Product) => void;
-  onCancelRestock?: (product: Product, request: ActiveRestock) => void;
-  onPreorderRequest?: (product: Product) => void;
-  onInterestEvent?: (product: Product, eventType: 'view' | 'click') => void;
+  card: Card;
+  sessionToken: string;
+  onPreorderClick?: (whatsappUrl: string) => void;
 };
 
 export default function ProductCard({
-  product,
-  activeRestock,
-  onAddToCart,
-  onRestockRequest,
-  onCancelRestock,
-  onPreorderRequest,
-  onInterestEvent
+  card,
+  sessionToken,
+  onPreorderClick
 }: ProductCardProps) {
-  const { trackClick } = useTracker();
-  const imageUrl = product.image_url || 'https://picsum.photos/500/700';
-  const isAvailable = product.stock > 0;
-  const isLaunch = product.release_status === 'lanzamiento';
-  const viewedProductId = useRef<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const viewedCardId = useRef<string | null>(null);
 
+  // Registrar vista de card
   useEffect(() => {
-    if (viewedProductId.current !== product.id) {
-      viewedProductId.current = product.id;
-      onInterestEvent?.(product, 'view');
+    if (viewedCardId.current !== card.id) {
+      viewedCardId.current = card.id;
+      void trackPageView(`card-${card.id}`, sessionToken);
     }
-  }, [onInterestEvent, product]);
+  }, [card.id, sessionToken]);
 
-  const handleImageClick = () => {
-    void trackClick('imagen_producto_detalle');
-    onInterestEvent?.(product, 'click');
+  const handlePreorderClick = async () => {
+    setIsLoading(true);
+    try {
+      const whatsappUrl = await createPreorderIntent({
+        cardId: card.id,
+        quantity: 1,
+        sessionToken,
+      });
+      
+      if (onPreorderClick) {
+        onPreorderClick(whatsappUrl);
+      } else {
+        // Abrir WhatsApp directamente
+        window.open(whatsappUrl, '_blank');
+      }
+    } catch (error) {
+      console.error('Error creating preorder:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleAddToCart = () => {
-    void trackClick('btn_agregar_carrito');
-    onInterestEvent?.(product, 'click');
-    onAddToCart?.(product);
+  const handleAddToWishlist = async () => {
+    try {
+      await trackAddToWishlist(card.id, sessionToken);
+      alert('✅ Agregada a lista de deseos');
+    } catch (error) {
+      console.error('Error adding to wishlist:', error);
+    }
   };
+  const isAvailable = card.quantity > 0;
 
   return (
-    <article className="overflow-hidden rounded-3xl border border-wiju-borderLight bg-wiju-cardLight shadow-card wiju-hover-lift dark:border-wiju-borderDark dark:bg-wiju-cardDark">
-      <button type="button" onClick={handleImageClick} className="relative block h-72 w-full overflow-hidden bg-black/20">
-        <Image src={imageUrl} alt={product.name} fill sizes="(min-width: 1024px) 25vw, 100vw" className="object-cover transition duration-300 hover:scale-105" />
-        <span className={`absolute left-3 top-3 inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-black shadow-card ${isAvailable ? 'bg-emerald-500 text-white' : 'bg-wiju-signMagenta text-white'}`}>
-          <SparkIcon className="h-3.5 w-3.5" /> {isAvailable ? 'Disponible' : 'Agotado'}
+    <article className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 dark:border-slate-700 dark:bg-slate-800">
+      {/* Imagen */}
+      <div className="relative block h-72 w-full overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-900 dark:to-slate-800">
+        <img
+          src={card.image}
+          alt={card.name}
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+        />
+        {/* Badge de disponibilidad */}
+        <span
+          className={`absolute left-3 top-3 inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-bold shadow-lg ${
+            isAvailable
+              ? 'bg-emerald-500 text-white'
+              : 'bg-red-500 text-white'
+          }`}
+        >
+          <SparkIcon className="h-3.5 w-3.5" />
+          {isAvailable ? 'Disponible' : 'Agotado'}
         </span>
-        {isLaunch && <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-wiju-moonGold px-3 py-1 text-xs font-black text-wiju-ink shadow-neon"><ClockIcon className="h-3.5 w-3.5" /> Lanzamiento</span>}
-      </button>
+      </div>
+
+      {/* Contenido */}
       <div className="space-y-4 p-5">
+        {/* Tags */}
         <div className="flex flex-wrap gap-2">
-          <span className="inline-flex items-center gap-1 rounded-full border border-wiju-borderLight px-3 py-1 text-xs font-bold dark:border-wiju-borderDark"><TagIcon className="h-3.5 w-3.5" /> {product.product_tag || 'En vitrina'}</span>
-          <span className="rounded-full border border-wiju-borderLight px-3 py-1 text-xs font-bold dark:border-wiju-borderDark">{product.category || 'TCG'}</span>
+          <span className="inline-flex items-center gap-1 rounded-full border border-purple-300 bg-purple-50 px-3 py-1 text-xs font-bold text-purple-700 dark:border-purple-600 dark:bg-purple-900/30 dark:text-purple-300">
+            <TagIcon className="h-3.5 w-3.5" />
+            {card.game}
+          </span>
+          <span className="rounded-full border border-slate-300 bg-slate-50 px-3 py-1 text-xs font-bold text-slate-700 dark:border-slate-600 dark:bg-slate-700/30 dark:text-slate-300">
+            {card.rarity}
+          </span>
         </div>
+
+        {/* Nombre */}
         <div>
-          <h3 className="line-clamp-2 text-lg font-black">{product.name}</h3>
-          <p className="mt-2 line-clamp-3 text-sm text-slate-600 dark:text-slate-300">{product.description || 'Producto TCG disponible para la comunidad de Trujillo.'}</p>
+          <h3 className="line-clamp-2 text-lg font-black text-slate-900 dark:text-white">
+            {card.name}
+          </h3>
         </div>
+
+        {/* Precio y Stock */}
         <div className="flex items-center justify-between">
-          <span className="text-2xl font-black text-wiju-signMagenta dark:text-wiju-moonGold">S/ {Number(product.price).toFixed(2)}</span>
-          <span className="rounded-full bg-wiju-signMagenta/10 px-3 py-1 text-xs font-bold text-wiju-signMagenta dark:bg-wiju-moonGold/10 dark:text-wiju-moonGold">Stock: {product.stock}</span>
+          <span className="text-2xl font-black text-purple-600 dark:text-purple-400">
+            S/ {card.price.toFixed(2)}
+          </span>
+          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700 dark:bg-slate-700 dark:text-slate-300">
+            Stock: {card.quantity}
+          </span>
         </div>
+
+        {/* Acciones */}
         {isAvailable ? (
           <button
             type="button"
-            onClick={handleAddToCart}
-            data-sound="cart"
-            className="focus-ring inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-wiju-signMagenta px-4 py-3 font-black text-white shadow-neon transition hover:-translate-y-0.5 dark:bg-wiju-moonGold dark:text-wiju-ink"
+            onClick={handlePreorderClick}
+            disabled={isLoading}
+            className="focus-ring inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-purple-600 px-4 py-3 font-bold text-white shadow-lg transition hover:bg-purple-700 disabled:opacity-50 dark:bg-purple-700 dark:hover:bg-purple-600"
           >
-            <CartIcon className="h-5 w-5" /> Añadir al carrito
+            <CartIcon className="h-5 w-5" />
+            {isLoading ? 'Procesando...' : 'Generar Preventa'}
           </button>
-        ) : activeRestock ? (
-          <div className="space-y-2">
-            <p className="rounded-2xl bg-wiju-moonGold/15 p-3 text-xs font-semibold">Solicitud en espera: se comparará con vistas, clics y mensajes oficiales de WhatsApp de la temporada.</p>
-            <button
-              type="button"
-              onClick={() => onCancelRestock?.(product, activeRestock)}
-              data-sound="tap"
-              className="focus-ring w-full rounded-2xl border border-wiju-signMagenta px-4 py-3 font-black text-wiju-signMagenta dark:border-wiju-moonGold dark:text-wiju-moonGold"
-            >
-              Cancelar stock/restock
-            </button>
-          </div>
         ) : (
-          <button
-            type="button"
-            onClick={() => onRestockRequest?.(product)}
-            data-sound="success"
-            className="focus-ring w-full rounded-2xl border border-wiju-signMagenta px-4 py-3 font-black text-wiju-signMagenta dark:border-wiju-moonGold dark:text-wiju-moonGold"
-          >
-            Pedir stock/restock
-          </button>
+          <div className="rounded-2xl bg-slate-100 px-4 py-3 text-center text-sm font-bold text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+            Agotado - Proximamente
+          </div>
         )}
-        {isLaunch && product.preorder_available && (
-          <button
-            type="button"
-            onClick={() => onPreorderRequest?.(product)}
-            data-sound="success"
-            className="focus-ring inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-black px-4 py-3 font-black text-wiju-moonGold shadow-neon dark:bg-white dark:text-wiju-signMagenta"
-          >
-            <ClockIcon className="h-5 w-5" /> Pedir lanzamiento
-          </button>
-        )}
+
+        {/* Botón de wishlist */}
+        <button
+          type="button"
+          onClick={handleAddToWishlist}
+          className="w-full rounded-2xl border-2 border-purple-300 px-4 py-2 font-bold text-purple-600 transition hover:bg-purple-50 dark:border-purple-600 dark:text-purple-400 dark:hover:bg-purple-900/20"
+        >
+          ♥ Agregar a Deseos
+        </button>
       </div>
     </article>
   );
