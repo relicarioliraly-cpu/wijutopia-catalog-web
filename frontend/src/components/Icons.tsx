@@ -29,6 +29,25 @@ export function CartIcon({ className = '', title, ...props }: IconProps) {
   );
 }
 
+export function UserIcon({ className = '', title, ...props }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden={title ? undefined : true} className={`${baseClass} ${className}`} {...props}>
+      {title && <title>{title}</title>}
+      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M4 21c0-3.31 2.69-6 6-6h4c3.31 0 6 2.69 6 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function CloseIcon({ className = '', title, ...props }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden={title ? undefined : true} className={`${baseClass} ${className}`} {...props}>
+      {title && <title>{title}</title>}
+      <path d="M6 6l12 12M6 18L18 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 export function CardsIcon({ className = '', title, ...props }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="none" aria-hidden={title ? undefined : true} className={`${baseClass} ${className}`} {...props}>

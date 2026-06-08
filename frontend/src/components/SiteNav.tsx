@@ -1,6 +1,12 @@
-import { CardsIcon, ChartIcon, ClockIcon, StoreIcon, TagIcon } from '@/components/Icons';
+'use client';
+
+import { useState } from 'react';
+import { CardsIcon, CartIcon, ChartIcon, ClockIcon, StoreIcon, TagIcon, UserIcon } from '@/components/Icons';
+import CartDrawer from '@/components/CartDrawer';
+import AccountModal from '@/components/AccountModal';
 import SoundToggle from '@/components/SoundToggle';
 import ThemeToggle from '@/components/ThemeToggle';
+import { useCart } from '@/components/CartContext';
 import { gameCatalog, productBranches, storeTagCatalog } from '@/lib/catalogTaxonomy';
 
 const mainLinks = [
@@ -11,6 +17,10 @@ const mainLinks = [
 ];
 
 export default function SiteNav() {
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isAccountOpen, setIsAccountOpen] = useState(false);
+  const { itemCount } = useCart();
+
   return (
     <header className="sticky top-0 z-40 border-b-2 border-wiju-moonGold/70 bg-wiju-logoWine px-4 py-3 text-white shadow-neon dark:border-wiju-moonGold dark:bg-wiju-logoWineDark">
       <nav className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3">
@@ -29,6 +39,27 @@ export default function SiteNav() {
               </a>
             );
           })}
+          <button
+            type="button"
+            onClick={() => setIsAccountOpen(true)}
+            className="inline-flex items-center justify-center rounded-full border border-white/20 bg-white/10 p-2 text-white transition hover:-translate-y-0.5 hover:border-wiju-moonGold hover:bg-white hover:text-wiju-logoWine focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-wiju-moonGold"
+            aria-label="Abrir cuenta de prueba"
+          >
+            <UserIcon className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsCartOpen(true)}
+            className="relative inline-flex items-center justify-center rounded-full border border-white/20 bg-white/10 p-2 text-white transition hover:-translate-y-0.5 hover:border-wiju-moonGold hover:bg-white hover:text-wiju-logoWine focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-wiju-moonGold"
+            aria-label="Abrir carrito de pruebas"
+          >
+            <CartIcon className="h-4 w-4" />
+            {itemCount > 0 && (
+              <span className="absolute -right-1 -top-1 grid h-5 min-w-[1.25rem] place-items-center rounded-full bg-wiju-signMagenta px-1.5 text-[0.65rem] font-black text-white">
+                {itemCount}
+              </span>
+            )}
+          </button>
           <SoundToggle />
           <ThemeToggle />
         </div>
@@ -64,6 +95,8 @@ export default function SiteNav() {
             </section>
           </div>
         </details>
+        <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+        <AccountModal isOpen={isAccountOpen} onClose={() => setIsAccountOpen(false)} />
       </nav>
     </header>
   );

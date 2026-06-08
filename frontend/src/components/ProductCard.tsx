@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { CartIcon, TagIcon, SparkIcon } from '@/components/Icons';
-import { Card, createPreorderIntent, trackPageView, trackAddToWishlist } from '@/lib/apiService';
+import { useCart } from '@/components/CartContext';
+import { Card, createPreorderIntent, trackPageView, trackAddToWishlist, trackAddToCart } from '@/lib/apiService';
 import { Product } from '@/lib/api';
 
 type ProductCardProps = {
@@ -31,6 +32,7 @@ export default function ProductCard({
   onPreorderClick,
   onInterestEvent
 }: ProductCardProps) {
+  const { addItem } = useCart();
   const [isLoading, setIsLoading] = useState(false);
   const viewedCardId = useRef<string | null>(null);
   const normalizedCard = card ?? (product ? normalizeProductToCard(product) : {
@@ -74,6 +76,24 @@ export default function ProductCard({
       console.error('Error creating preorder:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleAddToCart = async () => {
+    addItem({
+      id: normalizedCard.id,
+      name: normalizedCard.name,
+      game: normalizedCard.game,
+      rarity: normalizedCard.rarity,
+      price: normalizedCard.price,
+      image: normalizedCard.image,
+      quantity: 1,
+    });
+
+    try {
+      await trackAddToCart(normalizedCard.id, activeSessionToken);
+    } catch (error) {
+      console.error('Error tracking cart event:', error);
     }
   };
 
@@ -141,15 +161,25 @@ export default function ProductCard({
 
         {/* Acciones */}
         {isAvailable ? (
-          <button
-            type="button"
-            onClick={handlePreorderClick}
-            disabled={isLoading}
-            className="focus-ring inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-purple-600 px-4 py-3 font-bold text-white shadow-lg transition hover:bg-purple-700 disabled:opacity-50 dark:bg-purple-700 dark:hover:bg-purple-600"
-          >
-            <CartIcon className="h-5 w-5" />
-            {isLoading ? 'Procesando...' : 'Generar Preventa'}
-          </button>
+          <div className="grid gap-3">
+            <button
+              type="button"
+              onClick={handleAddToCart}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-wiju-signMagenta px-4 py-3 font-bold text-white shadow-lg transition hover:bg-purple-700 dark:bg-wiju-moonGold dark:text-slate-950 dark:hover:bg-yellow-300"
+            >
+              <CartIcon className="h-5 w-5" />
+              Agregar al carrito
+            </button>
+            <button
+              type="button"
+              onClick={handlePreorderClick}
+              disabled={isLoading}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-purple-300 bg-white px-4 py-3 font-bold text-purple-700 transition hover:border-purple-400 hover:bg-purple-50 disabled:opacity-50 dark:border-purple-600 dark:bg-slate-800 dark:text-purple-300 dark:hover:bg-purple-700"
+            >
+              <CartIcon className="h-5 w-5" />
+              {isLoading ? 'Procesando...' : 'Generar Preventa'}
+            </button>
+          </div>
         ) : (
           <div className="rounded-2xl bg-slate-100 px-4 py-3 text-center text-sm font-bold text-slate-600 dark:bg-slate-700 dark:text-slate-300">
             Agotado - Proximamente

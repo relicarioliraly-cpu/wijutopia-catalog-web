@@ -244,6 +244,23 @@ export async function trackAddToWishlist(cardId: string, sessionToken: string): 
   });
 }
 
+export async function trackAddToCart(cardId: string, sessionToken: string): Promise<void> {
+  return logClickstreamEvent({
+    eventType: 'ADD_TO_CART',
+    cardId,
+    timestamp: new Date().toISOString(),
+    sessionToken,
+  });
+}
+
+export async function trackCheckoutAttempt(sessionToken?: string): Promise<void> {
+  return logClickstreamEvent({
+    eventType: 'CHECKOUT_ATTEMPT',
+    timestamp: new Date().toISOString(),
+    sessionToken: sessionToken || 'guest',
+  });
+}
+
 export async function trackPageView(page: string, sessionToken: string): Promise<void> {
   return logClickstreamEvent({
     eventType: 'PAGE_VIEW',
