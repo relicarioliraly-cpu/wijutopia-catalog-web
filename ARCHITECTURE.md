@@ -361,7 +361,7 @@ GitHub Actions: Lint + Build
     ↓
 Deploy automático a Vercel
     ↓
-Production: wijutopia-catalog-web.vercel.app
+Production: https://frontend-nine-psi-97.vercel.app
     ↓
 Usuarios pueden usar
 ```

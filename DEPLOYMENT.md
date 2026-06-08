@@ -45,8 +45,10 @@ Install Command: npm install
 ### URL Resultante
 
 ```
-https://wijutopia-catalog-web.vercel.app
+https://frontend-nine-psi-97.vercel.app
 ```
+
+> Nota: Este despliegue actual se vinculó al proyecto Vercel `relicarioliraly-cpus-projects/frontend`.
 
 ---
 

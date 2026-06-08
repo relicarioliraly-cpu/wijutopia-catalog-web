@@ -5,6 +5,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-3178C6?logo=typescript)](https://www.typescriptlang.org)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38B2AC?logo=tailwindcss)](https://tailwindcss.com)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Frontend-nine-psi-97.vercel.app-blue?logo=vercel&logoColor=white)](https://frontend-nine-psi-97.vercel.app)
 
 **Catálogo Web Público de Wijutopia TCG** — Una plataforma moderna de e-commerce para el descubrimiento y preventa de cartas de Trading Card Games (TCG), diseñada como **frontend puro** con arquitectura lista para conectarse a un backend de gestión de admin e inventario.
 
@@ -311,6 +312,10 @@ git push origin main
 # 3. Desplegar automáticamente
 vercel deploy
 ```
+
+### Enlace de producción actual
+- URL: `https://frontend-nine-psi-97.vercel.app`
+- Proyecto Vercel: `relicarioliraly-cpus-projects/frontend`
 
 ## 🔐 Seguridad
 
