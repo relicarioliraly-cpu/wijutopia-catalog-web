@@ -150,6 +150,54 @@ export async function getAllCards(filters?: CatalogFilter): Promise<Card[]> {
 }
 ```
 
+### Backend + MongoDB Atlas
+
+1. En MongoDB Atlas, crea un nuevo clúster y agrega tu IP en **Network Access**.
+2. Crea un usuario de base de datos en **Database Access** y copia la conexión SRV.
+3. En `backend/.env`, configura:
+
+```env
+PORT=5000
+FRONTEND_ORIGIN=http://localhost:3000
+MONGODB_URI=mongodb+srv://<usuario>:<contraseña>@cluster0.ag3xtfu.mongodb.net/?retryWrites=true&w=majority
+MONGODB_DB=wijutopia_db
+```
+
+4. Inicia el backend desde la carpeta `backend`:
+
+```bash
+cd backend
+npm install
+npm run dev
+```
+
+5. Confirma que el backend responde:
+
+```bash
+curl http://localhost:5000/api/health
+```
+
+Si todo está correcto, verás una respuesta JSON con `success: true`.
+
+### Conectar el Frontend al Backend
+
+Crea `frontend/.env.local` con esta configuración:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:5000
+NODE_ENV=development
+```
+
+Luego ejecuta el frontend:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Con esta configuración, el catálogo buscará datos reales en tu backend Express y usará el fallback a MOCK solo si el backend no está disponible.
+
 ### Endpoints Esperados del Backend
 
 | Endpoint | Método | Descripción |
