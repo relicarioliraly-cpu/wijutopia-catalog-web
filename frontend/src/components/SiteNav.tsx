@@ -7,8 +7,7 @@ const mainLinks = [
   { href: '/client', label: 'Catálogo', icon: CardsIcon },
   { href: '/games', label: 'Juegos', icon: StoreIcon },
   { href: '/restock', label: 'Restock', icon: ChartIcon },
-  { href: '/releases', label: 'Lanzamientos', icon: ClockIcon },
-  { href: '/profile', label: 'Profile', icon: TagIcon }
+  { href: '/releases', label: 'Lanzamientos', icon: ClockIcon }
 ];
 
 export default function SiteNav() {

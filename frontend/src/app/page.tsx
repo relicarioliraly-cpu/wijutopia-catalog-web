@@ -17,11 +17,10 @@ export default function HomePage() {
             <h1 className="text-4xl font-black leading-tight md:text-7xl">Wijutopia TCG visual, claro y conectado.</h1>
           </div>
           <p className="max-w-3xl text-lg text-slate-600 dark:text-slate-300">
-            Prototipo académico con catálogo TCG, carrito, restock por señales, profile administrativo y una vista más limpia inspirada en la fachada morada de Wiju&apos;s.
+            Prototipo académico con catálogo TCG público, carrito de compras y restock por señales, todo con una vista inspirada en la fachada morada de Wiju&apos;s.
           </p>
           <div className="flex flex-wrap gap-4">
             <a href="/client" data-sound="cart" className="inline-flex items-center gap-2 rounded-2xl bg-wiju-signMagenta px-6 py-4 font-black text-white shadow-neon transition hover:-translate-y-1 dark:bg-wiju-moonGold dark:text-wiju-ink"><CartIcon /> Explorar catálogo</a>
-            <a href="/profile" data-sound="nav" className="inline-flex items-center gap-2 rounded-2xl border border-wiju-borderLight px-6 py-4 font-black transition hover:-translate-y-1 hover:border-wiju-moonGold dark:border-wiju-borderDark"><ChartIcon /> Profile</a>
           </div>
         </div>
 

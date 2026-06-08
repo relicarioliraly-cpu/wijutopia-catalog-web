@@ -12,20 +12,20 @@
   --wiju-black: #0b0b0f;
   --wiju-black-soft: #121218;
 
-  --wiju-wine: #5c002e;
-  --wiju-wine-dark: #3d001f;
-  --wiju-wine-light: #7a0b43;
+  --wiju-wine: #7242b8;
+  --wiju-wine-dark: #482a7d;
+  --wiju-wine-light: #a16de5;
 
-  --wiju-purple: #3c0f56;
-  --wiju-purple-dark: #24113f;
+  --wiju-purple: #4b1f77;
+  --wiju-purple-dark: #2f1449;
 
   --wiju-gold: #d8a126;
   --wiju-gold-light: #f2c55c;
 
-  --wiju-text: #ffffff;
-  --wiju-text-soft: #d7d7d7;
+  --wiju-text: #f8efff;
+  --wiju-text-soft: #d7cff7;
 
-  --wiju-border: rgba(216,161,38,.15);
+  --wiju-border: rgba(186, 129, 224, .18);
 }
 
 /* =========================================
@@ -74,15 +74,15 @@ body {
   background:
     linear-gradient(
       90deg,
-      #5c002e 0%,
-      #650637 30%,
-      #5c002e 100%
+      #7242b8 0%,
+      #5b22b0 35%,
+      #482a7d 100%
     );
 
-  border-bottom: 2px solid var(--wiju-gold);
+  border-bottom: 2px solid rgba(216,161,38,.9);
 
   box-shadow:
-    0 4px 25px rgba(0,0,0,.35);
+    0 4px 30px rgba(0,0,0,.4);
 }
 
 /* =========================================
@@ -126,18 +126,18 @@ body {
 .wiju-hero {
   background:
     linear-gradient(
-      135deg,
-      #050507,
-      #130816,
-      #1f0822
+      145deg,
+      #0a0012,
+      #190b2d,
+      #2f1651
     );
 
-  border: 1px solid rgba(216,161,38,.12);
+  border: 1px solid rgba(186, 129, 224, .18);
 
   border-radius: 2rem;
 
   box-shadow:
-    0 15px 40px rgba(0,0,0,.35);
+    0 18px 45px rgba(0,0,0,.4);
 }
 
 /* =========================================
@@ -148,11 +148,11 @@ body {
   background:
     linear-gradient(
       145deg,
-      #130816,
-      #1c0a20
+      #1f0f38,
+      #2e1771
     );
 
-  border: 1px solid rgba(216,161,38,.10);
+  border: 1px solid rgba(186, 129, 224, .16);
 
   border-radius: 1.5rem;
 
@@ -163,7 +163,29 @@ body {
   transform: translateY(-3px);
 
   box-shadow:
-    0 12px 35px rgba(0,0,0,.35);
+    0 12px 35px rgba(0,0,0,.45);
+}
+
+.btn-primary {
+  background: #7242b8;
+
+  color: white;
+
+  border: none;
+}
+
+.btn-primary:hover {
+  background: #8f5ee2;
+}
+
+.btn-gold {
+  background: var(--wiju-gold);
+
+  color: #111;
+}
+
+.btn-gold:hover {
+  background: var(--wiju-gold-light);
 }
 
 /* =========================================
