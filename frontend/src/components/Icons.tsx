@@ -39,6 +39,15 @@ export function UserIcon({ className = '', title, ...props }: IconProps) {
   );
 }
 
+export function HeartIcon({ className = '', title, ...props }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden={title ? undefined : true} className={`${baseClass} ${className}`} {...props}>
+      {title && <title>{title}</title>}
+      <path d="M12 20s-7-4.35-8.7-9.1C2.2 7.8 4.25 5 7.35 5c1.8 0 3.2.9 4.05 2.15C12.25 5.9 13.65 5 15.45 5c3.1 0 5.15 2.8 4.05 5.9C17.8 15.65 12 20 12 20Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 export function CloseIcon({ className = '', title, ...props }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="none" aria-hidden={title ? undefined : true} className={`${baseClass} ${className}`} {...props}>

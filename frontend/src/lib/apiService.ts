@@ -224,14 +224,18 @@ export async function getAvailableRarities(): Promise<string[]> {
 export async function logClickstreamEvent(event: ClickstreamEvent): Promise<void> {
   try {
     console.log('📊 Evento registrado:', event);
-    // TODO: Enviar al backend cuando el endpoint esté disponible
-    // await fetch(`${API_BASE_URL}/api/telemetry/clickstream`, {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(event),
-    // });
+    const response = await fetch(`${API_BASE_URL}/api/telemetry/clickstream`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(event),
+      keepalive: true,
+    });
+
+    if (!response.ok && response.status !== 404) {
+      console.warn(`Telemetry endpoint responded with ${response.status}`);
+    }
   } catch (error) {
-    console.error('Error logging telemetry:', error);
+    console.warn('Telemetry endpoint unavailable; event kept in browser log:', error);
   }
 }
 
@@ -247,6 +251,15 @@ export async function trackAddToWishlist(cardId: string, sessionToken: string): 
 export async function trackAddToCart(cardId: string, sessionToken: string): Promise<void> {
   return logClickstreamEvent({
     eventType: 'ADD_TO_CART',
+    cardId,
+    timestamp: new Date().toISOString(),
+    sessionToken,
+  });
+}
+
+export async function trackDetailClick(cardId: string, sessionToken: string): Promise<void> {
+  return logClickstreamEvent({
+    eventType: 'DETAIL_CLICK',
     cardId,
     timestamp: new Date().toISOString(),
     sessionToken,

@@ -100,8 +100,8 @@ export default function SegmentedCatalog({
   ];
 
   return (
-    <main className="mx-auto max-w-7xl space-y-8 px-4 py-10">
-      <section className={`rounded-[2rem] bg-gradient-to-br ${heroGradient} p-8 text-white shadow-card`}>
+    <main className="wiju-binder-shell mx-auto max-w-7xl space-y-8 px-4 py-10">
+      <section className={`rounded-[2rem] border border-amber-900/30 bg-gradient-to-br ${heroGradient} p-8 text-white shadow-card`}>
         {marker && <p className="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-sm font-black uppercase tracking-[0.25em] text-wiju-moonGold"><TagIcon className="h-4 w-4" /> {marker}</p>}
         <h1 className="mt-4 text-4xl font-black md:text-6xl">{title}</h1>
         <p className="mt-4 max-w-4xl text-white/85">{subtitle}</p>
@@ -113,7 +113,7 @@ export default function SegmentedCatalog({
         {hierarchy.map((item) => {
           const Icon = item.icon;
           return (
-            <article key={item.label} className="flex items-center gap-4 rounded-3xl border border-wiju-borderLight bg-wiju-cardLight p-5 wiju-hover-lift dark:border-wiju-borderDark dark:bg-wiju-doorPurple/50">
+            <article key={item.label} className="flex items-center gap-4 rounded-3xl border border-amber-900/20 bg-white/55 p-5 shadow-card backdrop-blur wiju-hover-lift dark:border-white/10 dark:bg-wiju-doorPurple/45">
               <span className="grid h-11 w-11 place-items-center rounded-2xl bg-wiju-signMagenta/10 text-wiju-signMagenta dark:bg-wiju-moonGold/10 dark:text-wiju-moonGold"><Icon /></span>
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">{item.label}</p>
@@ -124,7 +124,7 @@ export default function SegmentedCatalog({
         })}
       </section>
 
-      <section className="space-y-4 rounded-3xl border border-wiju-borderLight bg-wiju-cardLight p-5 wiju-hover-lift dark:border-wiju-borderDark dark:bg-wiju-doorPurple/50">
+      <section className="space-y-4 rounded-3xl border border-amber-900/20 bg-white/60 p-5 shadow-card backdrop-blur-xl wiju-hover-lift dark:border-white/10 dark:bg-wiju-doorPurple/45">
         <div className="grid gap-4 md:grid-cols-[1fr_auto]">
           <label className="flex items-center gap-3 rounded-2xl border border-wiju-borderLight bg-white px-5 py-3 text-wiju-ink dark:border-wiju-borderDark">
             <SearchIcon className="text-slate-400" />
@@ -177,12 +177,12 @@ export default function SegmentedCatalog({
         </div>
       </section>
 
-      <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+      <section className="wiju-binder-grid grid gap-6 rounded-[2rem] p-4 md:grid-cols-2 xl:grid-cols-4">
         {filteredProducts.map((product) => <ProductCard key={product.id} product={product} onInterestEvent={trackProductInterest} />)}
       </section>
 
       {filteredProducts.length === 0 && (
-        <section className="rounded-3xl border border-dashed border-wiju-borderLight p-8 text-center dark:border-wiju-borderDark">
+        <section className="rounded-3xl border border-dashed border-amber-900/40 bg-white/50 p-8 text-center backdrop-blur dark:border-wiju-borderDark dark:bg-white/5">
           <h2 className="text-2xl font-black">Sin productos cargados para este segmento</h2>
           <p className="mt-2 text-slate-600 dark:text-slate-300">La rama existe para organizar el sitio; el admin puede cargar productos con categoría/etiqueta correspondiente.</p>
         </section>
