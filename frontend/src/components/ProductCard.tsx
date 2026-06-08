@@ -4,36 +4,64 @@ import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { CartIcon, TagIcon, SparkIcon } from '@/components/Icons';
 import { Card, createPreorderIntent, trackPageView, trackAddToWishlist } from '@/lib/apiService';
+import { Product } from '@/lib/api';
 
 type ProductCardProps = {
-  card: Card;
-  sessionToken: string;
+  card?: Card;
+  product?: Product;
+  sessionToken?: string;
   onPreorderClick?: (whatsappUrl: string) => void;
+  onInterestEvent?: (product: Product, eventType: 'view' | 'click') => Promise<void>;
 };
+
+const normalizeProductToCard = (product: Product): Card => ({
+  id: product.id,
+  name: product.name,
+  game: product.category || 'TCG',
+  rarity: product.product_tag || 'Normal',
+  price: Number(product.price || 0),
+  image: product.image_url || 'https://via.placeholder.com/300x400?text=Sin+imagen',
+  quantity: Number(product.stock ?? 0),
+});
 
 export default function ProductCard({
   card,
+  product,
   sessionToken,
-  onPreorderClick
+  onPreorderClick,
+  onInterestEvent
 }: ProductCardProps) {
   const [isLoading, setIsLoading] = useState(false);
   const viewedCardId = useRef<string | null>(null);
+  const normalizedCard = card ?? (product ? normalizeProductToCard(product) : {
+    id: 'unknown',
+    name: 'Carta sin nombre',
+    game: 'TCG',
+    rarity: 'Normal',
+    price: 0,
+    image: 'https://via.placeholder.com/300x400?text=Sin+imagen',
+    quantity: 0,
+  });
+  const activeSessionToken = sessionToken || `guest_${Date.now()}`;
 
   // Registrar vista de card
   useEffect(() => {
-    if (viewedCardId.current !== card.id) {
-      viewedCardId.current = card.id;
-      void trackPageView(`card-${card.id}`, sessionToken);
+    if (viewedCardId.current !== normalizedCard.id) {
+      viewedCardId.current = normalizedCard.id;
+      void trackPageView(`card-${normalizedCard.id}`, activeSessionToken);
+      if (product && onInterestEvent) {
+        void onInterestEvent(product, 'view');
+      }
     }
-  }, [card.id, sessionToken]);
+  }, [normalizedCard.id, sessionToken, product, onInterestEvent]);
 
   const handlePreorderClick = async () => {
     setIsLoading(true);
     try {
       const whatsappUrl = await createPreorderIntent({
-        cardId: card.id,
+        cardId: normalizedCard.id,
         quantity: 1,
-        sessionToken,
+        sessionToken: activeSessionToken,
       });
       
       if (onPreorderClick) {
@@ -51,21 +79,21 @@ export default function ProductCard({
 
   const handleAddToWishlist = async () => {
     try {
-      await trackAddToWishlist(card.id, sessionToken);
+      await trackAddToWishlist(normalizedCard.id, activeSessionToken);
       alert('✅ Agregada a lista de deseos');
     } catch (error) {
       console.error('Error adding to wishlist:', error);
     }
   };
-  const isAvailable = card.quantity > 0;
+  const isAvailable = normalizedCard.quantity > 0;
 
   return (
     <article className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 dark:border-slate-700 dark:bg-slate-800">
       {/* Imagen */}
       <div className="relative block h-72 w-full overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-900 dark:to-slate-800">
         <img
-          src={card.image}
-          alt={card.name}
+          src={normalizedCard.image}
+          alt={normalizedCard.name}
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
         {/* Badge de disponibilidad */}
@@ -87,27 +115,27 @@ export default function ProductCard({
         <div className="flex flex-wrap gap-2">
           <span className="inline-flex items-center gap-1 rounded-full border border-purple-300 bg-purple-50 px-3 py-1 text-xs font-bold text-purple-700 dark:border-purple-600 dark:bg-purple-900/30 dark:text-purple-300">
             <TagIcon className="h-3.5 w-3.5" />
-            {card.game}
+            {normalizedCard.game}
           </span>
           <span className="rounded-full border border-slate-300 bg-slate-50 px-3 py-1 text-xs font-bold text-slate-700 dark:border-slate-600 dark:bg-slate-700/30 dark:text-slate-300">
-            {card.rarity}
+            {normalizedCard.rarity}
           </span>
         </div>
 
         {/* Nombre */}
         <div>
           <h3 className="line-clamp-2 text-lg font-black text-slate-900 dark:text-white">
-            {card.name}
+            {normalizedCard.name}
           </h3>
         </div>
 
         {/* Precio y Stock */}
         <div className="flex items-center justify-between">
           <span className="text-2xl font-black text-purple-600 dark:text-purple-400">
-            S/ {card.price.toFixed(2)}
+            S/ {normalizedCard.price.toFixed(2)}
           </span>
           <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700 dark:bg-slate-700 dark:text-slate-300">
-            Stock: {card.quantity}
+            Stock: {normalizedCard.quantity}
           </span>
         </div>
 
